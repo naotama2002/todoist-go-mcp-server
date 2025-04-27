@@ -44,10 +44,6 @@ func (tp *ToolProvider) GetTools() []server.ServerTool {
 			Handler: tp.HandleCloseTask,
 		},
 		{
-			Tool:    tp.ReopenTask(),
-			Handler: tp.HandleReopenTask,
-		},
-		{
 			Tool:    tp.DeleteTask(),
 			Handler: tp.HandleDeleteTask,
 		},

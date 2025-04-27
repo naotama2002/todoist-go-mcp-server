@@ -166,21 +166,7 @@ if token == "" {
 }
 ```
 
-#### 6. `todoist_reopen_task`
-
-完了したタスクを再開します。
-
-**パラメータ:**
-- `id` (string, required): タスクID
-
-**戻り値:**
-```json
-{
-  "success": true
-}
-```
-
-#### 7. `todoist_delete_task`
+#### 6. `todoist_delete_task`
 
 タスクを削除します。
 

@@ -68,7 +68,6 @@ GitHub の github-mcp-server を参考にした構造で実装します。
   - [x] `todoist_create_task` の実装
   - [x] `todoist_update_task` の実装
   - [x] `todoist_close_task` の実装
-  - [x] `todoist_reopen_task` の実装
   - [x] `todoist_delete_task` の実装
 
 #### プロジェクト管理ツール
@@ -164,7 +163,6 @@ GitHub の github-mcp-server を参考にした構造で実装します。
      - `todoist_create_task` ツールの実装
      - `todoist_update_task` ツールの実装
      - `todoist_close_task` ツールの実装
-     - `todoist_reopen_task` ツールの実装
      - `todoist_delete_task` ツールの実装
 
 4. MCP サーバの実装

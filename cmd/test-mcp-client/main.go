@@ -65,7 +65,7 @@ func main() {
 		if len(os.Args) > 4 {
 			arguments["description"] = os.Args[4]
 		}
-	case "todoist_close_task", "todoist_reopen_task", "todoist_delete_task":
+	case "todoist_close_task", "todoist_delete_task":
 		if len(os.Args) < 3 {
 			fmt.Println("使用法: go run main.go " + toolName + " <task_id>")
 			os.Exit(1)
@@ -73,7 +73,7 @@ func main() {
 		arguments["id"] = os.Args[2]
 	default:
 		fmt.Printf("未知のツール名: %s\n", toolName)
-		fmt.Println("利用可能なツール: todoist_get_tasks, todoist_get_task, todoist_create_task, todoist_update_task, todoist_close_task, todoist_reopen_task, todoist_delete_task")
+		fmt.Println("利用可能なツール: todoist_get_tasks, todoist_get_task, todoist_create_task, todoist_update_task, todoist_close_task, todoist_delete_task")
 		os.Exit(1)
 	}
 

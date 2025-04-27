@@ -77,11 +77,6 @@ type CloseTaskParams struct {
 	ID string `json:"id"`
 }
 
-// ReopenTaskParams represents the parameters for the todoist_reopen_task tool
-type ReopenTaskParams struct {
-	ID string `json:"id"`
-}
-
 // DeleteTaskParams represents the parameters for the todoist_delete_task tool
 type DeleteTaskParams struct {
 	ID string `json:"id"`
@@ -574,61 +569,6 @@ func (tp *ToolProvider) HandleCloseTask(ctx context.Context, request mcp.CallToo
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to close task")
 		return mcp.NewToolResultErrorFromErr("Failed to close task", err), nil
-	}
-
-	// Return success response
-	return mcp.NewToolResultText(`{"success": true}`), nil
-}
-
-// ReopenTask returns the todoist_reopen_task tool
-func (tp *ToolProvider) ReopenTask() mcp.Tool {
-	// Define the input schema for the tool
-	inputSchema := map[string]interface{}{
-		"type": "object",
-		"required": []string{"id"},
-		"properties": map[string]interface{}{
-			"id": map[string]interface{}{
-				"type":        "string",
-				"description": "Task ID",
-			},
-		},
-	}
-
-	// Convert the input schema to JSON
-	inputSchemaJSON, err := json.Marshal(inputSchema)
-	if err != nil {
-		tp.logger.WithError(err).Error("Failed to marshal input schema")
-		return mcp.Tool{}
-	}
-
-	// Create the tool
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_reopen_task",
-		"Mark a task as not completed.",
-		inputSchemaJSON,
-	)
-	
-	return tool
-}
-
-// HandleReopenTask handles the todoist_reopen_task tool request
-func (tp *ToolProvider) HandleReopenTask(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	// Parse parameters
-	id, err := RequiredParam[string](request, "id")
-	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Missing required parameter: id", err), nil
-	}
-
-	// Log the request
-	tp.logger.WithFields(map[string]interface{}{
-		"id": id,
-	}).Info("Reopening task")
-
-	// Call the Todoist API
-	err = tp.client.ReopenTask(id)
-	if err != nil {
-		tp.logger.WithError(err).Error("Failed to reopen task")
-		return mcp.NewToolResultErrorFromErr("Failed to reopen task", err), nil
 	}
 
 	// Return success response
