@@ -27,6 +27,30 @@ func (tp *ToolProvider) GetTools() []server.ServerTool {
 			Tool:    tp.GetTasks(),
 			Handler: tp.HandleGetTasks,
 		},
+		{
+			Tool:    tp.GetTask(),
+			Handler: tp.HandleGetTask,
+		},
+		{
+			Tool:    tp.CreateTask(),
+			Handler: tp.HandleCreateTask,
+		},
+		{
+			Tool:    tp.UpdateTask(),
+			Handler: tp.HandleUpdateTask,
+		},
+		{
+			Tool:    tp.CloseTask(),
+			Handler: tp.HandleCloseTask,
+		},
+		{
+			Tool:    tp.ReopenTask(),
+			Handler: tp.HandleReopenTask,
+		},
+		{
+			Tool:    tp.DeleteTask(),
+			Handler: tp.HandleDeleteTask,
+		},
 		// Add other tools here
 	}
 }

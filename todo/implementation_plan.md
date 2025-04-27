@@ -46,11 +46,11 @@ GitHub の github-mcp-server を参考にした構造で実装します。
   - [x] レート制限への対応
   - [x] タスク関連 API の実装
     - [x] タスク一覧取得
-    - [ ] タスク詳細取得
-    - [ ] タスク作成
-    - [ ] タスク更新
-    - [ ] タスク完了/再開
-    - [ ] タスク削除
+    - [x] タスク詳細取得
+    - [x] タスク作成
+    - [x] タスク更新
+    - [x] タスク完了/再開
+    - [x] タスク削除
   - [ ] プロジェクト関連 API の実装
     - [ ] プロジェクト一覧取得
     - [ ] プロジェクト詳細取得
@@ -67,12 +67,12 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 #### タスク管理ツール
 - [x] pkg/todoist/tasks.go の実装
   - [x] `todoist_get_tasks` の実装
-  - [ ] `todoist_get_task` の実装
-  - [ ] `todoist_create_task` の実装
-  - [ ] `todoist_update_task` の実装
-  - [ ] `todoist_close_task` の実装
-  - [ ] `todoist_reopen_task` の実装
-  - [ ] `todoist_delete_task` の実装
+  - [x] `todoist_get_task` の実装
+  - [x] `todoist_create_task` の実装
+  - [x] `todoist_update_task` の実装
+  - [x] `todoist_close_task` の実装
+  - [x] `todoist_reopen_task` の実装
+  - [x] `todoist_delete_task` の実装
 
 #### プロジェクト管理ツール
 - [ ] pkg/todoist/projects.go の実装
@@ -154,11 +154,24 @@ GitHub の github-mcp-server を参考にした構造で実装します。
    - HTTP クライアントの実装
    - 認証ヘッダーの設定
    - エラーハンドリングの実装
-   - タスク一覧取得 API の実装
+   - タスク関連 API の実装
+     - タスク一覧取得
+     - タスク詳細取得
+     - タスク作成
+     - タスク更新
+     - タスク完了/再開
+     - タスク削除
 
-3. MCP ツールの基本実装
+3. MCP ツールの実装
    - ツール定義の共通処理
-   - `todoist_get_tasks` ツールの実装
+   - タスク管理ツールの実装
+     - `todoist_get_tasks` ツールの実装
+     - `todoist_get_task` ツールの実装
+     - `todoist_create_task` ツールの実装
+     - `todoist_update_task` ツールの実装
+     - `todoist_close_task` ツールの実装
+     - `todoist_reopen_task` ツールの実装
+     - `todoist_delete_task` ツールの実装
 
 4. MCP サーバの実装
    - サーバの初期化
@@ -169,19 +182,18 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 ### 現在の動作確認状況
 - HTTP モードでのサーバ起動が可能
 - stdio モードでのサーバ起動が可能
-- `todoist_get_tasks` ツールが正常に動作し、Todoist API からタスクを取得可能
+- すべてのタスク管理ツールが実装済み
 - MCP プロトコルに準拠したリクエスト処理が実装済み
 - Claude Desktop などの MCP クライアントから呼び出し可能
+- テスト用の MCP クライアントを実装し、コマンドライン引数からツール名と引数を指定可能
 
 ### 次のステップ
-1. 残りのタスク管理ツールの実装
-   - `todoist_get_task`
-   - `todoist_create_task`
-   - `todoist_update_task`
-   - `todoist_close_task`
-   - `todoist_reopen_task`
-   - `todoist_delete_task`
+1. プロジェクト管理ツールの実装
+   - `todoist_get_projects`
+   - `todoist_get_project`
+   - `todoist_create_project`
+   - `todoist_update_project`
+   - `todoist_delete_project`
 
-2. プロジェクト管理ツールの実装
-3. ユニットテストの追加
-4. ドキュメントの整備
+2. ユニットテストの追加
+3. ドキュメントの整備

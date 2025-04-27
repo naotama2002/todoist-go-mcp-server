@@ -25,12 +25,62 @@ type CallToolParams struct {
 
 func main() {
 	// MCP サーバーの URL
-	serverURL := "http://localhost:8081"
+	serverURL := "http://localhost:8082"
+
+	// コマンドライン引数からツール名を取得
+	toolName := "todoist_get_tasks"
+	if len(os.Args) > 1 {
+		toolName = os.Args[1]
+	}
+
+	// ツール引数を初期化
+	arguments := map[string]interface{}{}
+
+	// ツール名に応じて引数を設定
+	switch toolName {
+	case "todoist_get_tasks":
+		// 引数なし（デフォルト）
+	case "todoist_get_task":
+		if len(os.Args) < 3 {
+			fmt.Println("使用法: go run main.go todoist_get_task <task_id>")
+			os.Exit(1)
+		}
+		arguments["id"] = os.Args[2]
+	case "todoist_create_task":
+		if len(os.Args) < 3 {
+			fmt.Println("使用法: go run main.go todoist_create_task <content> [description]")
+			os.Exit(1)
+		}
+		arguments["content"] = os.Args[2]
+		if len(os.Args) > 3 {
+			arguments["description"] = os.Args[3]
+		}
+	case "todoist_update_task":
+		if len(os.Args) < 4 {
+			fmt.Println("使用法: go run main.go todoist_update_task <task_id> <content> [description]")
+			os.Exit(1)
+		}
+		arguments["id"] = os.Args[2]
+		arguments["content"] = os.Args[3]
+		if len(os.Args) > 4 {
+			arguments["description"] = os.Args[4]
+		}
+	case "todoist_close_task", "todoist_reopen_task", "todoist_delete_task":
+		if len(os.Args) < 3 {
+			fmt.Println("使用法: go run main.go " + toolName + " <task_id>")
+			os.Exit(1)
+		}
+		arguments["id"] = os.Args[2]
+	default:
+		fmt.Printf("未知のツール名: %s\n", toolName)
+		fmt.Println("利用可能なツール: todoist_get_tasks, todoist_get_task, todoist_create_task, todoist_update_task, todoist_close_task, todoist_reopen_task, todoist_delete_task")
+		os.Exit(1)
+	}
 
 	// todoist_get_tasks ツールを呼び出すリクエストを作成
 	callToolParams := CallToolParams{
-		Name:      "todoist_get_tasks",
-		Arguments: map[string]interface{}{},
+		Name:      toolName,
+		Arguments: arguments,
 	}
 
 	// JSON-RPC リクエストを作成
