@@ -54,9 +54,6 @@ GitHub の github-mcp-server を参考にした構造で実装します。
   - [ ] プロジェクト関連 API の実装
     - [ ] プロジェクト一覧取得
     - [ ] プロジェクト詳細取得
-    - [ ] プロジェクト作成
-    - [ ] プロジェクト更新
-    - [ ] プロジェクト削除
 
 ### 3. MCP ツールの実装 (3-4日目)
 
@@ -78,9 +75,6 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 - [ ] pkg/todoist/projects.go の実装
   - [ ] `todoist_get_projects` の実装
   - [ ] `todoist_get_project` の実装
-  - [ ] `todoist_create_project` の実装
-  - [ ] `todoist_update_project` の実装
-  - [ ] `todoist_delete_project` の実装
 
 ### 4. MCP サーバの実装 (5日目)
 
@@ -191,9 +185,6 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 1. プロジェクト管理ツールの実装
    - `todoist_get_projects`
    - `todoist_get_project`
-   - `todoist_create_project`
-   - `todoist_update_project`
-   - `todoist_delete_project`
 
 2. ユニットテストの追加
 3. ドキュメントの整備

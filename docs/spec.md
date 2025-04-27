@@ -250,68 +250,6 @@ if token == "" {
 }
 ```
 
-#### 3. `todoist_create_project`
-
-新しいプロジェクトを作成します。
-
-**パラメータ:**
-- `name` (string, required): プロジェクト名
-- `parentId` (string, optional): 親プロジェクトID
-- `color` (string, optional): 色
-- `isFavorite` (bool, optional): お気に入りかどうか
-- `viewStyle` (string, optional): 表示スタイル
-
-**戻り値:**
-```json
-{
-  "project": {
-    "id": "2203306141",
-    "name": "Shopping List",
-    "comment_count": 0,
-    "order": 1,
-    "color": "charcoal",
-    "is_shared": false,
-    "is_favorite": false,
-    "is_inbox_project": false,
-    "is_team_inbox": false,
-    "view_style": "list",
-    "url": "https://todoist.com/showProject?id=2203306141"
-  }
-}
-```
-
-#### 4. `todoist_update_project`
-
-既存のプロジェクトを更新します。
-
-**パラメータ:**
-- `id` (string, required): プロジェクトID
-- `name` (string, optional): プロジェクト名
-- `color` (string, optional): 色
-- `isFavorite` (bool, optional): お気に入りかどうか
-- `viewStyle` (string, optional): 表示スタイル
-
-**戻り値:**
-```json
-{
-  "success": true
-}
-```
-
-#### 5. `todoist_delete_project`
-
-プロジェクトを削除します。
-
-**パラメータ:**
-- `id` (string, required): プロジェクトID
-
-**戻り値:**
-```json
-{
-  "success": true
-}
-```
-
 ## 実装計画
 
 1. プロジェクト構造の設定
