@@ -17,18 +17,18 @@ type JSONRPCRequest struct {
 	Params  interface{} `json:"params"`
 }
 
-// CallToolRequest 構造体
-type CallToolRequest struct {
+// CallToolParams 構造体
+type CallToolParams struct {
 	Name      string                 `json:"name"`
 	Arguments map[string]interface{} `json:"arguments"`
 }
 
 func main() {
 	// MCP サーバーの URL
-	serverURL := "http://localhost:8080"
+	serverURL := "http://localhost:8081"
 
 	// todoist_get_tasks ツールを呼び出すリクエストを作成
-	callToolParams := CallToolRequest{
+	callToolParams := CallToolParams{
 		Name:      "todoist_get_tasks",
 		Arguments: map[string]interface{}{},
 	}
@@ -37,7 +37,7 @@ func main() {
 	request := JSONRPCRequest{
 		JSONRPC: "2.0",
 		ID:      1,
-		Method:  "callTool",
+		Method:  "tools/call",
 		Params:  callToolParams,
 	}
 
@@ -47,6 +47,8 @@ func main() {
 		fmt.Printf("リクエストの JSON 変換に失敗しました: %v\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Printf("送信するリクエスト: %s\n", string(requestJSON))
 
 	// HTTP リクエストを送信
 	resp, err := http.Post(serverURL, "application/json", bytes.NewBuffer(requestJSON))
@@ -66,4 +68,10 @@ func main() {
 	// レスポンスを表示
 	fmt.Printf("ステータスコード: %d\n", resp.StatusCode)
 	fmt.Printf("レスポンス: %s\n", string(body))
+
+	// レスポンスを整形して表示
+	var prettyJSON bytes.Buffer
+	if err := json.Indent(&prettyJSON, body, "", "  "); err == nil {
+		fmt.Printf("整形されたレスポンス:\n%s\n", prettyJSON.String())
+	}
 }

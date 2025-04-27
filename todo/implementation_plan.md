@@ -30,22 +30,22 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 
 ### 1. プロジェクト初期化と依存関係の設定 (1日目)
 
-- [ ] Go モジュールの初期化
-- [ ] 必要なライブラリの追加
-  - mcp-go フレームワーク
-  - HTTP クライアントライブラリ
-  - 設定ファイル管理ライブラリ
-- [ ] ディレクトリ構造の設定（github-mcp-server を参考に）
+- [x] Go モジュールの初期化
+- [x] 必要なライブラリの追加
+  - [x] mcp-go フレームワーク
+  - [x] HTTP クライアントライブラリ
+  - [x] 設定ファイル管理ライブラリ
+- [x] ディレクトリ構造の設定（github-mcp-server を参考に）
 
 ### 2. Todoist API クライアントの実装 (1-2日目)
 
-- [ ] pkg/todoist/client.go の実装
-  - [ ] HTTP クライアントの基本実装
-  - [ ] 認証ヘッダーの設定
-  - [ ] エラーハンドリングの実装
-  - [ ] レート制限への対応
-  - [ ] タスク関連 API の実装
-    - [ ] タスク一覧取得
+- [x] pkg/todoist/client.go の実装
+  - [x] HTTP クライアントの基本実装
+  - [x] 認証ヘッダーの設定
+  - [x] エラーハンドリングの実装
+  - [x] レート制限への対応
+  - [x] タスク関連 API の実装
+    - [x] タスク一覧取得
     - [ ] タスク詳細取得
     - [ ] タスク作成
     - [ ] タスク更新
@@ -60,13 +60,13 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 
 ### 3. MCP ツールの実装 (3-4日目)
 
-- [ ] pkg/todoist/tools.go の実装
-  - [ ] ツール定義の共通処理
-  - [ ] エラーハンドリング
+- [x] pkg/todoist/tools.go の実装
+  - [x] ツール定義の共通処理
+  - [x] エラーハンドリング
 
 #### タスク管理ツール
-- [ ] pkg/todoist/tasks.go の実装
-  - [ ] `todoist_get_tasks` の実装
+- [x] pkg/todoist/tasks.go の実装
+  - [x] `todoist_get_tasks` の実装
   - [ ] `todoist_get_task` の実装
   - [ ] `todoist_create_task` の実装
   - [ ] `todoist_update_task` の実装
@@ -84,15 +84,15 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 
 ### 4. MCP サーバの実装 (5日目)
 
-- [ ] pkg/todoist/server.go の実装
-  - [ ] サーバの初期化
-  - [ ] ツールの登録
-  - [ ] エラーハンドリングの実装
-  - [ ] ログ出力の設定
-- [ ] cmd/todoist-mcp-server/main.go の実装
-  - [ ] コマンドライン引数の処理
-  - [ ] 設定の読み込み
-  - [ ] サーバの起動
+- [x] pkg/todoist/server.go の実装
+  - [x] サーバの初期化
+  - [x] ツールの登録
+  - [x] エラーハンドリングの実装
+  - [x] ログ出力の設定
+- [x] cmd/todoist-mcp-server/main.go の実装
+  - [x] コマンドライン引数の処理
+  - [x] 設定の読み込み
+  - [x] サーバの起動
 
 ### 5. ツールセットの実装 (5日目)
 
@@ -141,3 +141,47 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 - GitHub MCP サーバ実装: https://github.com/github/github-mcp-server
 - Todoist API ドキュメント: https://developer.todoist.com/rest/v2/
 - mcp-go ドキュメント: https://github.com/mark3labs/mcp-go
+
+## 実装状況（2025-04-27 更新）
+
+### 完了した作業
+1. プロジェクト初期化と依存関係の設定
+   - Go モジュールの初期化
+   - 必要なライブラリの追加
+   - ディレクトリ構造の設定
+
+2. Todoist API クライアントの基本実装
+   - HTTP クライアントの実装
+   - 認証ヘッダーの設定
+   - エラーハンドリングの実装
+   - タスク一覧取得 API の実装
+
+3. MCP ツールの基本実装
+   - ツール定義の共通処理
+   - `todoist_get_tasks` ツールの実装
+
+4. MCP サーバの実装
+   - サーバの初期化
+   - ツールの登録
+   - HTTP モードと stdio モードの両方をサポート
+   - MCP プロトコルに準拠したリクエスト処理の実装
+
+### 現在の動作確認状況
+- HTTP モードでのサーバ起動が可能
+- stdio モードでのサーバ起動が可能
+- `todoist_get_tasks` ツールが正常に動作し、Todoist API からタスクを取得可能
+- MCP プロトコルに準拠したリクエスト処理が実装済み
+- Claude Desktop などの MCP クライアントから呼び出し可能
+
+### 次のステップ
+1. 残りのタスク管理ツールの実装
+   - `todoist_get_task`
+   - `todoist_create_task`
+   - `todoist_update_task`
+   - `todoist_close_task`
+   - `todoist_reopen_task`
+   - `todoist_delete_task`
+
+2. プロジェクト管理ツールの実装
+3. ユニットテストの追加
+4. ドキュメントの整備

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 	"os/signal"
@@ -12,7 +13,8 @@ import (
 
 func main() {
 	// Parse command line flags
-	addr := flag.String("addr", ":8080", "Address to listen on")
+	mode := flag.String("mode", "http", "Server mode: 'http' or 'stdio'")
+	addr := flag.String("addr", ":8080", "Address to listen on (HTTP mode only)")
 	token := flag.String("token", "", "Todoist API token")
 	flag.Parse()
 
@@ -27,21 +29,43 @@ func main() {
 		}
 	}
 
-	// Create and start the server
+	// Create the server
 	server := todoist.NewServer(*token, logger)
 
 	// Handle graceful shutdown
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigCh
-		logger.Info("Shutting down...")
-		os.Exit(0)
-	}()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	// Start the server
-	logger.WithField("addr", *addr).Info("Starting Todoist MCP server")
-	if err := server.Start(*addr); err != nil {
-		logger.WithError(err).Fatal("Failed to start server")
+	// Start the server based on the mode
+	switch *mode {
+	case "http":
+		// Start the server in HTTP mode
+		logger.WithField("addr", *addr).Info("Starting Todoist MCP server in HTTP mode")
+		if err := server.Start(*addr); err != nil {
+			logger.WithError(err).Fatal("Failed to start server")
+		}
+	case "stdio":
+		// Start the server in stdio mode
+		logger.Info("Starting Todoist MCP server in stdio mode")
+		
+		// Create channels for errors
+		errCh := make(chan error, 1)
+		
+		// Start the server in a goroutine
+		go func() {
+			errCh <- server.StartStdio(ctx, os.Stdin, os.Stdout)
+		}()
+		
+		// Wait for shutdown signal or error
+		select {
+		case <-ctx.Done():
+			logger.Info("Shutting down...")
+		case err := <-errCh:
+			if err != nil {
+				logger.WithError(err).Fatal("Failed to run server")
+			}
+		}
+	default:
+		logger.Fatalf("Invalid mode: %s. Must be 'http' or 'stdio'", *mode)
 	}
 }
