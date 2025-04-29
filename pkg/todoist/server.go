@@ -12,10 +12,10 @@ import (
 
 // Server represents a Todoist MCP server
 type Server struct {
-	mcpServer  *server.MCPServer
-	tools      *ToolProvider
-	logger     *logrus.Logger
-	httpServer *http.Server
+	mcpServer   *server.MCPServer
+	tools       *ToolProvider
+	logger      *logrus.Logger
+	httpServer  *http.Server
 	stdioServer *server.StdioServer
 }
 
@@ -42,9 +42,9 @@ func NewServer(token string, logger *logrus.Logger) *Server {
 	stdioServer := server.NewStdioServer(mcpServer)
 
 	return &Server{
-		mcpServer:  mcpServer,
-		tools:      tools,
-		logger:     logger,
+		mcpServer:   mcpServer,
+		tools:       tools,
+		logger:      logger,
 		stdioServer: stdioServer,
 	}
 }

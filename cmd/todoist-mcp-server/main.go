@@ -47,15 +47,15 @@ func main() {
 	case "stdio":
 		// Start the server in stdio mode
 		logger.Info("Starting Todoist MCP server in stdio mode")
-		
+
 		// Create channels for errors
 		errCh := make(chan error, 1)
-		
+
 		// Start the server in a goroutine
 		go func() {
 			errCh <- server.StartStdio(ctx, os.Stdin, os.Stdout)
 		}()
-		
+
 		// Wait for shutdown signal or error
 		select {
 		case <-ctx.Done():

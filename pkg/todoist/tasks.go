@@ -102,7 +102,7 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 			},
 			"filter": map[string]interface{}{
 				"type":        "string",
-				"description": "Filter string",
+				"description": "Natural language filter like 'today', 'tomorrow', 'next week', 'priority 1', 'overdue'",
 			},
 			"lang": map[string]interface{}{
 				"type":        "string",
@@ -131,10 +131,10 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 		"Get a list of tasks.",
 		inputSchemaJSON,
 	)
-	
+
 	// Mark as read-only
 	tool.Annotations.ReadOnlyHint = true
-	
+
 	return tool
 }
 
@@ -146,7 +146,7 @@ func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallTool
 	label, _ := OptionalParam[string](request, "label")
 	filter, _ := OptionalParam[string](request, "filter")
 	lang, _ := OptionalParam[string](request, "lang")
-	
+
 	// Parse IDs array
 	ids, _ := OptionalStringArrayParam(request, "ids")
 
@@ -184,7 +184,7 @@ func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallTool
 func (tp *ToolProvider) GetTask() mcp.Tool {
 	// Define the input schema for the tool
 	inputSchema := map[string]interface{}{
-		"type": "object",
+		"type":     "object",
 		"required": []string{"id"},
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
@@ -207,10 +207,10 @@ func (tp *ToolProvider) GetTask() mcp.Tool {
 		"Get a specific task by ID.",
 		inputSchemaJSON,
 	)
-	
+
 	// Mark as read-only
 	tool.Annotations.ReadOnlyHint = true
-	
+
 	return tool
 }
 
@@ -251,7 +251,7 @@ func (tp *ToolProvider) HandleGetTask(ctx context.Context, request mcp.CallToolR
 func (tp *ToolProvider) CreateTask() mcp.Tool {
 	// Define the input schema for the tool
 	inputSchema := map[string]interface{}{
-		"type": "object",
+		"type":     "object",
 		"required": []string{"content"},
 		"properties": map[string]interface{}{
 			"content": map[string]interface{}{
@@ -323,7 +323,7 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 		"Create a new task.",
 		inputSchemaJSON,
 	)
-	
+
 	return tool
 }
 
@@ -334,7 +334,7 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 	if err != nil {
 		return mcp.NewToolResultErrorFromErr("Missing required parameter: content", err), nil
 	}
-	
+
 	description, _ := OptionalParam[string](request, "description")
 	projectID, _ := OptionalParam[string](request, "projectId")
 	sectionID, _ := OptionalParam[string](request, "sectionId")
@@ -398,7 +398,7 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 func (tp *ToolProvider) UpdateTask() mcp.Tool {
 	// Define the input schema for the tool
 	inputSchema := map[string]interface{}{
-		"type": "object",
+		"type":     "object",
 		"required": []string{"id"},
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
@@ -458,7 +458,7 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 		"Update an existing task.",
 		inputSchemaJSON,
 	)
-	
+
 	return tool
 }
 
@@ -469,7 +469,7 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 	if err != nil {
 		return mcp.NewToolResultErrorFromErr("Missing required parameter: id", err), nil
 	}
-	
+
 	content, _ := OptionalParam[string](request, "content")
 	description, _ := OptionalParam[string](request, "description")
 	labels, _ := OptionalStringArrayParam(request, "labels")
@@ -524,7 +524,7 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 func (tp *ToolProvider) CloseTask() mcp.Tool {
 	// Define the input schema for the tool
 	inputSchema := map[string]interface{}{
-		"type": "object",
+		"type":     "object",
 		"required": []string{"id"},
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
@@ -547,7 +547,7 @@ func (tp *ToolProvider) CloseTask() mcp.Tool {
 		"Mark a task as completed.",
 		inputSchemaJSON,
 	)
-	
+
 	return tool
 }
 
@@ -579,7 +579,7 @@ func (tp *ToolProvider) HandleCloseTask(ctx context.Context, request mcp.CallToo
 func (tp *ToolProvider) DeleteTask() mcp.Tool {
 	// Define the input schema for the tool
 	inputSchema := map[string]interface{}{
-		"type": "object",
+		"type":     "object",
 		"required": []string{"id"},
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
@@ -602,7 +602,7 @@ func (tp *ToolProvider) DeleteTask() mcp.Tool {
 		"Delete a task.",
 		inputSchemaJSON,
 	)
-	
+
 	return tool
 }
 
