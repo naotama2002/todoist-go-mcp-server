@@ -90,27 +90,27 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 		"properties": map[string]interface{}{
 			"projectId": map[string]interface{}{
 				"type":        "string",
-				"description": "Project ID",
+				"description": "Filter tasks by project ID. Retrieves only tasks belonging to the specified project.",
 			},
 			"sectionId": map[string]interface{}{
 				"type":        "string",
-				"description": "Section ID",
+				"description": "Filter tasks by section ID. Retrieves only tasks belonging to the specified section.",
 			},
 			"label": map[string]interface{}{
 				"type":        "string",
-				"description": "Label name",
+				"description": "Filter tasks by label name. Retrieves only tasks with the specified label.",
 			},
 			"filter": map[string]interface{}{
 				"type":        "string",
-				"description": "Natural language filter like 'today', 'tomorrow', 'next week', 'priority 1', 'overdue'",
+				"description": "Todoist filter query using the Todoist filter syntax. Examples: 'today', 'tomorrow', 'next week', 'overdue', 'priority 1', 'search: meeting', 'date: 2023-12-31', 'no date'. See https://todoist.com/help/articles/introduction-to-filters for more examples.",
 			},
 			"lang": map[string]interface{}{
 				"type":        "string",
-				"description": "Language code",
+				"description": "Language code for parsing the filter query. Examples: 'en' (English), 'ja' (Japanese), 'zh' (Chinese), 'es' (Spanish), 'fr' (French).",
 			},
 			"ids": map[string]interface{}{
 				"type":        "array",
-				"description": "List of task IDs",
+				"description": "List of specific task IDs to retrieve. Note: When multiple parameters are provided, the API follows this precedence: filter > ids > label/project_id/section_id.",
 				"items": map[string]interface{}{
 					"type": "string",
 				},
@@ -189,7 +189,7 @@ func (tp *ToolProvider) GetTask() mcp.Tool {
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
 				"type":        "string",
-				"description": "Task ID",
+				"description": "The unique identifier of the task to retrieve. Specify the numeric Todoist task ID (e.g., '2995104339').",
 			},
 		},
 	}
@@ -256,56 +256,56 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 		"properties": map[string]interface{}{
 			"content": map[string]interface{}{
 				"type":        "string",
-				"description": "Task content",
+				"description": "The content of the task (required). Supports text formatting using Markdown syntax. See https://todoist.com/help/articles/format-text-in-a-todoist-task for formatting options.",
 			},
 			"description": map[string]interface{}{
 				"type":        "string",
-				"description": "Task description",
+				"description": "Detailed description or notes for the task. Supports Markdown formatting for rich text.",
 			},
 			"projectId": map[string]interface{}{
 				"type":        "string",
-				"description": "Project ID",
+				"description": "Project ID to assign the task to. If not specified, the task will be added to the Inbox project.",
 			},
 			"sectionId": map[string]interface{}{
 				"type":        "string",
-				"description": "Section ID",
+				"description": "Section ID to place the task in. The section must belong to the specified project.",
 			},
 			"parentId": map[string]interface{}{
 				"type":        "string",
-				"description": "Parent task ID",
+				"description": "Parent task ID for creating subtasks. The task will be created as a child of this task.",
 			},
 			"order": map[string]interface{}{
 				"type":        "integer",
-				"description": "Task order",
+				"description": "Order value for positioning the task within its parent or project. Tasks are sorted by this value in ascending order.",
 			},
 			"labels": map[string]interface{}{
 				"type":        "array",
-				"description": "Task labels",
+				"description": "Array of label names to attach to the task. Labels that don't exist will be created.",
 				"items": map[string]interface{}{
 					"type": "string",
 				},
 			},
 			"priority": map[string]interface{}{
 				"type":        "integer",
-				"description": "Task priority (1-4)",
+				"description": "Task priority: 4 (normal, default), 3 (medium), 2 (high), 1 (urgent). Note that 1 is the highest priority, 4 is the lowest.",
 				"minimum":     1,
 				"maximum":     4,
 			},
 			"dueString": map[string]interface{}{
 				"type":        "string",
-				"description": "Due date in natural language",
+				"description": "Due date in natural language, e.g., 'today', 'tomorrow', 'next Monday', 'Jan 15'. Only one of dueString, dueDate, or dueDatetime should be used.",
 			},
 			"dueDate": map[string]interface{}{
 				"type":        "string",
-				"description": "Due date in YYYY-MM-DD format",
+				"description": "Due date in YYYY-MM-DD format, e.g., '2023-12-31'. Only one of dueString, dueDate, or dueDatetime should be used.",
 			},
 			"dueDatetime": map[string]interface{}{
 				"type":        "string",
-				"description": "Due date and time in RFC3339 format",
+				"description": "Due date and time in RFC3339 format, e.g., '2023-12-31T10:00:00Z'. Only one of dueString, dueDate, or dueDatetime should be used.",
 			},
 			"dueLang": map[string]interface{}{
 				"type":        "string",
-				"description": "Language for parsing due_string",
+				"description": "Language code for parsing dueString. Examples: 'en' (English), 'ja' (Japanese), 'zh' (Chinese), 'es' (Spanish), 'fr' (French).",
 			},
 		},
 	}
@@ -403,44 +403,44 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
 				"type":        "string",
-				"description": "Task ID",
+				"description": "The unique identifier of the task to update (required). Specify the numeric Todoist task ID (e.g., '2995104339').",
 			},
 			"content": map[string]interface{}{
 				"type":        "string",
-				"description": "Task content",
+				"description": "The new content of the task. Supports text formatting using Markdown syntax. See https://todoist.com/help/articles/format-text-in-a-todoist-task for formatting options.",
 			},
 			"description": map[string]interface{}{
 				"type":        "string",
-				"description": "Task description",
+				"description": "Detailed description or notes for the task. Supports Markdown formatting for rich text.",
 			},
 			"labels": map[string]interface{}{
 				"type":        "array",
-				"description": "Task labels",
+				"description": "Array of label names to attach to the task. This will replace all existing labels. Use an empty array to remove all labels.",
 				"items": map[string]interface{}{
 					"type": "string",
 				},
 			},
 			"priority": map[string]interface{}{
 				"type":        "integer",
-				"description": "Task priority (1-4)",
+				"description": "Task priority: 4 (normal, default), 3 (medium), 2 (high), 1 (urgent). Note that 1 is the highest priority, 4 is the lowest.",
 				"minimum":     1,
 				"maximum":     4,
 			},
 			"dueString": map[string]interface{}{
 				"type":        "string",
-				"description": "Due date in natural language",
+				"description": "Due date in natural language, e.g., 'today', 'tomorrow', 'next Monday', 'Jan 15'. Only one of dueString, dueDate, or dueDatetime should be used.",
 			},
 			"dueDate": map[string]interface{}{
 				"type":        "string",
-				"description": "Due date in YYYY-MM-DD format",
+				"description": "Due date in YYYY-MM-DD format, e.g., '2023-12-31'. Only one of dueString, dueDate, or dueDatetime should be used.",
 			},
 			"dueDatetime": map[string]interface{}{
 				"type":        "string",
-				"description": "Due date and time in RFC3339 format",
+				"description": "Due date and time in RFC3339 format, e.g., '2023-12-31T10:00:00Z'. Only one of dueString, dueDate, or dueDatetime should be used.",
 			},
 			"dueLang": map[string]interface{}{
 				"type":        "string",
-				"description": "Language for parsing due_string",
+				"description": "Language code for parsing dueString. Examples: 'en' (English), 'ja' (Japanese), 'zh' (Chinese), 'es' (Spanish), 'fr' (French).",
 			},
 		},
 	}
@@ -529,7 +529,7 @@ func (tp *ToolProvider) CloseTask() mcp.Tool {
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
 				"type":        "string",
-				"description": "Task ID",
+				"description": "The unique identifier of the task to mark as completed (required). Specify the numeric Todoist task ID (e.g., '2995104339').",
 			},
 		},
 	}
@@ -584,7 +584,7 @@ func (tp *ToolProvider) DeleteTask() mcp.Tool {
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
 				"type":        "string",
-				"description": "Task ID",
+				"description": "The unique identifier of the task to delete (required). Specify the numeric Todoist task ID (e.g., '2995104339'). Warning: This action is permanent and cannot be undone.",
 			},
 		},
 	}

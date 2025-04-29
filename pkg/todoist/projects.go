@@ -85,7 +85,7 @@ func (tp *ToolProvider) GetProject() mcp.Tool {
 		"properties": map[string]interface{}{
 			"id": map[string]interface{}{
 				"type":        "string",
-				"description": "Project ID",
+				"description": "The unique identifier of the project to retrieve. Specify the numeric Todoist project ID (e.g., '2203306141').",
 			},
 		},
 	}
