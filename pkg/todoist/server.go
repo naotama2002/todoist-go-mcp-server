@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/naotama2002/todoist-go-mcp-server/pkg/toolsets"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,6 +18,7 @@ type Server struct {
 	logger      *logrus.Logger
 	httpServer  *http.Server
 	stdioServer *server.StdioServer
+	toolsetGroup *toolsets.ToolsetGroup
 }
 
 // NewServer creates a new Todoist MCP server
@@ -41,21 +43,60 @@ func NewServer(token string, logger *logrus.Logger) *Server {
 	// Create a new stdio server
 	stdioServer := server.NewStdioServer(mcpServer)
 
+	// Create default toolset group
+	toolsetGroup := createDefaultToolsetGroup(tools, false)
+
 	return &Server{
 		mcpServer:   mcpServer,
 		tools:       tools,
 		logger:      logger,
 		stdioServer: stdioServer,
+		toolsetGroup: toolsetGroup,
 	}
+}
+
+// createDefaultToolsetGroup creates the default toolset group for Todoist
+func createDefaultToolsetGroup(tp *ToolProvider, readOnly bool) *toolsets.ToolsetGroup {
+	group := toolsets.NewToolsetGroup(readOnly)
+
+	// Create task management toolset
+	taskToolset := toolsets.NewToolset("tasks", "Todoist task management tools")
+	taskToolset.AddReadTools(
+		toolsets.NewServerTool(tp.GetTasks(), tp.HandleGetTasks),
+		toolsets.NewServerTool(tp.GetTask(), tp.HandleGetTask),
+	)
+	
+	if !readOnly {
+		taskToolset.AddWriteTools(
+			toolsets.NewServerTool(tp.CreateTask(), tp.HandleCreateTask),
+			toolsets.NewServerTool(tp.UpdateTask(), tp.HandleUpdateTask),
+			toolsets.NewServerTool(tp.CloseTask(), tp.HandleCloseTask),
+			toolsets.NewServerTool(tp.DeleteTask(), tp.HandleDeleteTask),
+		)
+	}
+
+	// Create project management toolset
+	projectToolset := toolsets.NewToolset("projects", "Todoist project management tools")
+	projectToolset.AddReadTools(
+		toolsets.NewServerTool(tp.GetProjects(), tp.HandleGetProjects),
+		toolsets.NewServerTool(tp.GetProject(), tp.HandleGetProject),
+	)
+
+	// Add toolsets to the group
+	group.AddToolset(taskToolset)
+	group.AddToolset(projectToolset)
+
+	// Enable all toolsets by default
+	group.EnableToolsets([]string{"all"})
+
+	return group
 }
 
 // Start starts the Todoist MCP server over HTTP
 func (s *Server) Start(addr string) error {
-	// Register tools
-	for _, tool := range s.tools.GetTools() {
-		s.mcpServer.AddTool(tool.Tool, tool.Handler)
-		s.logger.WithField("tool", tool.Tool.Name).Info("Registered tool")
-	}
+	// Register tools using toolset group
+	s.toolsetGroup.RegisterTools(s.mcpServer)
+	s.logger.Info("Registered tools from toolset group")
 
 	// Create HTTP server with MCP protocol handler
 	mux := http.NewServeMux()
@@ -102,11 +143,9 @@ func (s *Server) Start(addr string) error {
 
 // StartStdio starts the Todoist MCP server over stdio
 func (s *Server) StartStdio(ctx context.Context, in io.Reader, out io.Writer) error {
-	// Register tools
-	for _, tool := range s.tools.GetTools() {
-		s.mcpServer.AddTool(tool.Tool, tool.Handler)
-		s.logger.WithField("tool", tool.Tool.Name).Info("Registered tool")
-	}
+	// Register tools using toolset group
+	s.toolsetGroup.RegisterTools(s.mcpServer)
+	s.logger.Info("Registered tools from toolset group")
 
 	s.logger.Info("Starting Todoist MCP server over stdio")
 	return s.stdioServer.Listen(ctx, in, out)

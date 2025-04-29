@@ -71,9 +71,9 @@ GitHub の github-mcp-server を参考にした構造で実装します。
   - [x] `todoist_delete_task` の実装
 
 #### プロジェクト管理ツール
-- [ ] pkg/todoist/projects.go の実装
-  - [ ] `todoist_get_projects` の実装
-  - [ ] `todoist_get_project` の実装
+- [x] pkg/todoist/projects.go の実装
+  - [x] `todoist_get_projects` の実装
+  - [x] `todoist_get_project` の実装
 
 ### 4. MCP サーバの実装 (5日目)
 
@@ -89,9 +89,9 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 
 ### 5. ツールセットの実装 (5日目)
 
-- [ ] pkg/toolsets/ の実装
-  - [ ] デフォルトツールセットの定義
-  - [ ] カスタムツールセットの実装（必要に応じて）
+- [x] pkg/toolsets/ の実装
+  - [x] デフォルトツールセットの定義
+  - [x] カスタムツールセットの実装（必要に応じて）
 
 ### 6. テストの実装 (6日目)
 
@@ -170,6 +170,10 @@ GitHub の github-mcp-server を参考にした構造で実装します。
    - ツールの登録
    - HTTP モードと stdio モードの両方をサポート
    - MCP プロトコルに準拠したリクエスト処理の実装
+
+5. ツールセットの実装
+   - デフォルトツールセットの定義
+   - カスタムツールセットの実装
 
 ### 現在の動作確認状況
 - HTTP モードでのサーバ起動が可能

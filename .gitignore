@@ -1,0 +1,55 @@
+# バイナリファイル
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# テストバイナリ
+*.test
+
+# カバレッジファイル
+*.out
+
+# Go関連の一時ファイル
+*.o
+*.a
+*.prof
+
+# 依存関係のキャッシュ
+vendor/
+
+# ビルド成果物
+bin/
+dist/
+
+# direnv設定ファイル
+.envrc
+
+# エディタの設定ファイル
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS固有のファイル
+.DS_Store
+
+# ログファイル
+*.log
+
+# 環境変数ファイル
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# デバッグファイル
+debug
+__debug_bin
+
+# Go Workspaceファイル
+go.work
+go.work.sum

@@ -47,6 +47,14 @@ func (tp *ToolProvider) GetTools() []server.ServerTool {
 			Tool:    tp.DeleteTask(),
 			Handler: tp.HandleDeleteTask,
 		},
+		{
+			Tool:    tp.GetProjects(),
+			Handler: tp.HandleGetProjects,
+		},
+		{
+			Tool:    tp.GetProject(),
+			Handler: tp.HandleGetProject,
+		},
 		// Add other tools here
 	}
 }
