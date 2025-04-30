@@ -644,7 +644,7 @@ func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 
 	// Check if the parameter is of the expected type
 	if _, ok := r.Params.Arguments[p].(T); !ok {
-		return zero, nil
+		return zero, fmt.Errorf("parameter %s is not of the expected type", p)
 	}
 
 	return r.Params.Arguments[p].(T), nil
@@ -652,31 +652,32 @@ func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 
 // OptionalStringArrayParam is a helper function that can be used to fetch a requested parameter from the request.
 // It does the following checks:
-// 1. Checks if the parameter is present in the request, if not, it returns its zero-value
-// 2. If it is present, iterates the elements and checks each is a string
+// 1. Checks if the parameter is present in the request, if not, it returns nil
+// 2. If it is present, it checks if the parameter is an array
+// 3. If it is an array, it checks each element is a string
 func OptionalStringArrayParam(r mcp.CallToolRequest, p string) ([]string, error) {
 	// Check if the parameter is present in the request
 	if _, ok := r.Params.Arguments[p]; !ok {
-		return []string{}, nil
+		return nil, nil
 	}
 
 	switch v := r.Params.Arguments[p].(type) {
 	case nil:
-		return []string{}, nil
+		return nil, nil
 	case []string:
 		return v, nil
 	case []interface{}:
 		strSlice := make([]string, len(v))
-		for i, v := range v {
-			s, ok := v.(string)
+		for i, val := range v {
+			s, ok := val.(string)
 			if !ok {
-				return []string{}, nil
+				return nil, fmt.Errorf("parameter %s contains non-string elements", p)
 			}
 			strSlice[i] = s
 		}
 		return strSlice, nil
 	default:
-		return []string{}, nil
+		return nil, fmt.Errorf("parameter %s is not an array", p)
 	}
 }
 

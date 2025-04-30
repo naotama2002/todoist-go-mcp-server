@@ -95,11 +95,11 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 
 ### 6. テストの実装 (6日目)
 
-- [ ] ユニットテストの実装
-  - [ ] client_test.go
-  - [ ] tasks_test.go
-  - [ ] projects_test.go
-  - [ ] server_test.go
+- [x] ユニットテストの実装
+  - [x] client_test.go
+  - [x] tasks_test.go
+  - [x] projects_test.go
+  - [x] server_test.go
 - [ ] 統合テストの実装
 - [ ] モックサーバの実装（必要に応じて）
 
@@ -175,6 +175,12 @@ GitHub の github-mcp-server を参考にした構造で実装します。
    - デフォルトツールセットの定義
    - カスタムツールセットの実装
 
+6. ユニットテストの実装
+   - client_test.go
+   - tasks_test.go
+   - projects_test.go
+   - server_test.go
+
 ### 現在の動作確認状況
 - HTTP モードでのサーバ起動が可能
 - stdio モードでのサーバ起動が可能
@@ -188,5 +194,5 @@ GitHub の github-mcp-server を参考にした構造で実装します。
    - `todoist_get_projects`
    - `todoist_get_project`
 
-2. ユニットテストの追加
+2. 統合テストの追加
 3. ドキュメントの整備
