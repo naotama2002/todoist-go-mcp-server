@@ -26,11 +26,7 @@ if token == "" {
 
 **パラメータ:**
 - `projectId` (string, optional): プロジェクトID
-- `sectionId` (string, optional): セクションID
-- `label` (string, optional): ラベル名
 - `filter` (string, optional): フィルター文字列
-- `lang` (string, optional): 言語コード
-- `ids` ([]string, optional): タスクIDのリスト
 
 **戻り値:**
 ```json
@@ -41,9 +37,7 @@ if token == "" {
       "content": "Buy Milk",
       "description": "",
       "project_id": "2203306141",
-      "section_id": "7025",
       "parent_id": "2995104589",
-      "labels": ["Food", "Shopping"],
       "priority": 1,
       "due": {
         "date": "2016-09-01",
@@ -73,9 +67,7 @@ if token == "" {
     "content": "Buy Milk",
     "description": "",
     "project_id": "2203306141",
-    "section_id": "7025",
     "parent_id": "2995104589",
-    "labels": ["Food", "Shopping"],
     "priority": 1,
     "due": {
       "date": "2016-09-01",
@@ -97,14 +89,11 @@ if token == "" {
 - `content` (string, required): タスクの内容
 - `description` (string, optional): タスクの詳細説明
 - `projectId` (string, optional): プロジェクトID
-- `sectionId` (string, optional): セクションID
 - `parentId` (string, optional): 親タスクID
-- `labels` ([]string, optional): ラベルのリスト
 - `priority` (int, optional): 優先度 (1-4)
 - `dueString` (string, optional): 期限を表す文字列
 - `dueDate` (string, optional): 期限の日付
 - `dueDatetime` (string, optional): 期限の日時
-- `dueLang` (string, optional): 期限の言語
 
 **戻り値:**
 ```json
@@ -114,9 +103,7 @@ if token == "" {
     "content": "Buy Milk",
     "description": "",
     "project_id": "2203306141",
-    "section_id": "7025",
     "parent_id": "2995104589",
-    "labels": ["Food", "Shopping"],
     "priority": 1,
     "due": {
       "date": "2016-09-01",
@@ -138,12 +125,10 @@ if token == "" {
 - `id` (string, required): タスクID
 - `content` (string, optional): タスクの内容
 - `description` (string, optional): タスクの詳細説明
-- `labels` ([]string, optional): ラベルのリスト
 - `priority` (int, optional): 優先度 (1-4)
 - `dueString` (string, optional): 期限を表す文字列
 - `dueDate` (string, optional): 期限の日付
 - `dueDatetime` (string, optional): 期限の日時
-- `dueLang` (string, optional): 期限の言語
 
 **戻り値:**
 ```json

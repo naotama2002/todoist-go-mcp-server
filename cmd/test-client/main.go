@@ -23,7 +23,7 @@ func main() {
 	client := todoist.NewClient(token, logger)
 
 	// タスクを取得
-	tasks, err := client.GetTasks("", "", "", "", "", nil)
+	tasks, err := client.GetTasks("", "")
 	if err != nil {
 		logger.WithError(err).Error("タスクの取得に失敗しました")
 		os.Exit(1)
