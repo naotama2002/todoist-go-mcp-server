@@ -10,12 +10,8 @@ import (
 
 // GetTasksParams represents the parameters for the todoist_get_tasks tool
 type GetTasksParams struct {
-	ProjectID string   `json:"projectId,omitempty"`
-	SectionID string   `json:"sectionId,omitempty"`
-	Label     string   `json:"label,omitempty"`
-	Filter    string   `json:"filter,omitempty"`
-	Lang      string   `json:"lang,omitempty"`
-	IDs       []string `json:"ids,omitempty"`
+	ProjectID string `json:"projectId,omitempty"`
+	Filter    string `json:"filter,omitempty"`
 }
 
 // GetTasksResponse represents the response from the todoist_get_tasks tool
@@ -35,18 +31,15 @@ type GetTaskResponse struct {
 
 // CreateTaskParams represents the parameters for the todoist_create_task tool
 type CreateTaskParams struct {
-	Content     string   `json:"content"`
-	Description string   `json:"description,omitempty"`
-	ProjectID   string   `json:"projectId,omitempty"`
-	SectionID   string   `json:"sectionId,omitempty"`
-	ParentID    string   `json:"parentId,omitempty"`
-	Order       int      `json:"order,omitempty"`
-	Labels      []string `json:"labels,omitempty"`
-	Priority    int      `json:"priority,omitempty"`
-	DueString   string   `json:"dueString,omitempty"`
-	DueDate     string   `json:"dueDate,omitempty"`
-	DueDatetime string   `json:"dueDatetime,omitempty"`
-	DueLang     string   `json:"dueLang,omitempty"`
+	Content     string `json:"content"`
+	Description string `json:"description,omitempty"`
+	ProjectID   string `json:"projectId,omitempty"`
+	ParentID    string `json:"parentId,omitempty"`
+	Order       int    `json:"order,omitempty"`
+	Priority    int    `json:"priority,omitempty"`
+	DueString   string `json:"dueString,omitempty"`
+	DueDate     string `json:"dueDate,omitempty"`
+	DueDatetime string `json:"dueDatetime,omitempty"`
 }
 
 // CreateTaskResponse represents the response from the todoist_create_task tool
@@ -56,15 +49,13 @@ type CreateTaskResponse struct {
 
 // UpdateTaskParams represents the parameters for the todoist_update_task tool
 type UpdateTaskParams struct {
-	ID          string   `json:"id"`
-	Content     string   `json:"content,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Labels      []string `json:"labels,omitempty"`
-	Priority    int      `json:"priority,omitempty"`
-	DueString   string   `json:"dueString,omitempty"`
-	DueDate     string   `json:"dueDate,omitempty"`
-	DueDatetime string   `json:"dueDatetime,omitempty"`
-	DueLang     string   `json:"dueLang,omitempty"`
+	ID          string `json:"id"`
+	Content     string `json:"content,omitempty"`
+	Description string `json:"description,omitempty"`
+	Priority    int    `json:"priority,omitempty"`
+	DueString   string `json:"dueString,omitempty"`
+	DueDate     string `json:"dueDate,omitempty"`
+	DueDatetime string `json:"dueDatetime,omitempty"`
 }
 
 // UpdateTaskResponse represents the response from the todoist_update_task tool
@@ -92,28 +83,9 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 				"type":        "string",
 				"description": "Filter tasks by project ID. Retrieves only tasks belonging to the specified project.",
 			},
-			"sectionId": map[string]interface{}{
-				"type":        "string",
-				"description": "Filter tasks by section ID. Retrieves only tasks belonging to the specified section.",
-			},
-			"label": map[string]interface{}{
-				"type":        "string",
-				"description": "Filter tasks by label name. Retrieves only tasks with the specified label.",
-			},
 			"filter": map[string]interface{}{
 				"type":        "string",
 				"description": "Todoist filter query using the Todoist filter syntax. Examples: 'today', 'tomorrow', 'next week', 'overdue', 'priority 1', 'search: meeting', 'date: 2023-12-31', 'no date'. See https://todoist.com/help/articles/introduction-to-filters for more examples.",
-			},
-			"lang": map[string]interface{}{
-				"type":        "string",
-				"description": "Language code for parsing the filter query. Examples: 'en' (English), 'ja' (Japanese), 'zh' (Chinese), 'es' (Spanish), 'fr' (French).",
-			},
-			"ids": map[string]interface{}{
-				"type":        "array",
-				"description": "List of specific task IDs to retrieve. Note: When multiple parameters are provided, the API follows this precedence: filter > ids > label/project_id/section_id.",
-				"items": map[string]interface{}{
-					"type": "string",
-				},
 			},
 		},
 	}
@@ -142,26 +114,16 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	projectID, _ := OptionalParam[string](request, "projectId")
-	sectionID, _ := OptionalParam[string](request, "sectionId")
-	label, _ := OptionalParam[string](request, "label")
 	filter, _ := OptionalParam[string](request, "filter")
-	lang, _ := OptionalParam[string](request, "lang")
-
-	// Parse IDs array
-	ids, _ := OptionalStringArrayParam(request, "ids")
 
 	// Log the request
 	tp.logger.WithFields(map[string]interface{}{
 		"projectId": projectID,
-		"sectionId": sectionID,
-		"label":     label,
 		"filter":    filter,
-		"lang":      lang,
-		"ids":       ids,
 	}).Info("Getting tasks")
 
 	// Call the Todoist API
-	tasks, err := tp.client.GetTasks(projectID, sectionID, label, filter, lang, ids)
+	tasks, err := tp.client.GetTasks(projectID, filter)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get tasks")
 		return mcp.NewToolResultErrorFromErr("Failed to get tasks", err), nil
@@ -266,10 +228,6 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 				"type":        "string",
 				"description": "Project ID to assign the task to. If not specified, the task will be added to the Inbox project.",
 			},
-			"sectionId": map[string]interface{}{
-				"type":        "string",
-				"description": "Section ID to place the task in. The section must belong to the specified project.",
-			},
 			"parentId": map[string]interface{}{
 				"type":        "string",
 				"description": "Parent task ID for creating subtasks. The task will be created as a child of this task.",
@@ -277,13 +235,6 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 			"order": map[string]interface{}{
 				"type":        "integer",
 				"description": "Order value for positioning the task within its parent or project. Tasks are sorted by this value in ascending order.",
-			},
-			"labels": map[string]interface{}{
-				"type":        "array",
-				"description": "Array of label names to attach to the task. Labels that don't exist will be created.",
-				"items": map[string]interface{}{
-					"type": "string",
-				},
 			},
 			"priority": map[string]interface{}{
 				"type":        "integer",
@@ -302,10 +253,6 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 			"dueDatetime": map[string]interface{}{
 				"type":        "string",
 				"description": "Due date and time in RFC3339 format, e.g., '2023-12-31T10:00:00Z'. Only one of dueString, dueDate, or dueDatetime should be used.",
-			},
-			"dueLang": map[string]interface{}{
-				"type":        "string",
-				"description": "Language code for parsing dueString. Examples: 'en' (English), 'ja' (Japanese), 'zh' (Chinese), 'es' (Spanish), 'fr' (French).",
 			},
 		},
 	}
@@ -337,24 +284,19 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 
 	description, _ := OptionalParam[string](request, "description")
 	projectID, _ := OptionalParam[string](request, "projectId")
-	sectionID, _ := OptionalParam[string](request, "sectionId")
 	parentID, _ := OptionalParam[string](request, "parentId")
 	order, _ := OptionalParam[int](request, "order")
-	labels, _ := OptionalStringArrayParam(request, "labels")
 	priority, _ := OptionalParam[int](request, "priority")
 	dueString, _ := OptionalParam[string](request, "dueString")
 	dueDate, _ := OptionalParam[string](request, "dueDate")
 	dueDatetime, _ := OptionalParam[string](request, "dueDatetime")
-	dueLang, _ := OptionalParam[string](request, "dueLang")
 
 	// Log the request
 	tp.logger.WithFields(map[string]interface{}{
 		"content":     content,
 		"description": description,
 		"projectId":   projectID,
-		"sectionId":   sectionID,
 		"parentId":    parentID,
-		"labels":      labels,
 		"priority":    priority,
 	}).Info("Creating task")
 
@@ -363,15 +305,12 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 		Content:     content,
 		Description: description,
 		ProjectID:   projectID,
-		SectionID:   sectionID,
 		ParentID:    parentID,
 		Order:       order,
-		Labels:      labels,
 		Priority:    priority,
 		DueString:   dueString,
 		DueDate:     dueDate,
 		DueDatetime: dueDatetime,
-		DueLang:     dueLang,
 	}
 
 	// Call the Todoist API
@@ -413,13 +352,6 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 				"type":        "string",
 				"description": "Detailed description or notes for the task. Supports Markdown formatting for rich text.",
 			},
-			"labels": map[string]interface{}{
-				"type":        "array",
-				"description": "Array of label names to attach to the task. This will replace all existing labels. Use an empty array to remove all labels.",
-				"items": map[string]interface{}{
-					"type": "string",
-				},
-			},
 			"priority": map[string]interface{}{
 				"type":        "integer",
 				"description": "Task priority: 4 (normal, default), 3 (medium), 2 (high), 1 (urgent). Note that 1 is the highest priority, 4 is the lowest.",
@@ -437,10 +369,6 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 			"dueDatetime": map[string]interface{}{
 				"type":        "string",
 				"description": "Due date and time in RFC3339 format, e.g., '2023-12-31T10:00:00Z'. Only one of dueString, dueDate, or dueDatetime should be used.",
-			},
-			"dueLang": map[string]interface{}{
-				"type":        "string",
-				"description": "Language code for parsing dueString. Examples: 'en' (English), 'ja' (Japanese), 'zh' (Chinese), 'es' (Spanish), 'fr' (French).",
 			},
 		},
 	}
@@ -472,19 +400,16 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 
 	content, _ := OptionalParam[string](request, "content")
 	description, _ := OptionalParam[string](request, "description")
-	labels, _ := OptionalStringArrayParam(request, "labels")
 	priority, _ := OptionalParam[int](request, "priority")
 	dueString, _ := OptionalParam[string](request, "dueString")
 	dueDate, _ := OptionalParam[string](request, "dueDate")
 	dueDatetime, _ := OptionalParam[string](request, "dueDatetime")
-	dueLang, _ := OptionalParam[string](request, "dueLang")
 
 	// Log the request
 	tp.logger.WithFields(map[string]interface{}{
 		"id":          id,
 		"content":     content,
 		"description": description,
-		"labels":      labels,
 		"priority":    priority,
 	}).Info("Updating task")
 
@@ -492,12 +417,10 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 	updateReq := UpdateTaskRequest{
 		Content:     content,
 		Description: description,
-		Labels:      labels,
 		Priority:    priority,
 		DueString:   dueString,
 		DueDate:     dueDate,
 		DueDatetime: dueDatetime,
-		DueLang:     dueLang,
 	}
 
 	// Call the Todoist API
@@ -658,12 +581,12 @@ func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 func OptionalStringArrayParam(r mcp.CallToolRequest, p string) ([]string, error) {
 	// Check if the parameter is present in the request
 	if _, ok := r.Params.Arguments[p]; !ok {
-		return nil, nil
+		return []string{}, nil
 	}
 
 	switch v := r.Params.Arguments[p].(type) {
 	case nil:
-		return nil, nil
+		return []string{}, nil
 	case []string:
 		return v, nil
 	case []interface{}:

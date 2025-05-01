@@ -27,11 +27,7 @@ func TestGetTasks(t *testing.T) {
 	tests := []struct {
 		name      string
 		projectID string
-		sectionID string
-		label     string
 		filter    string
-		lang      string
-		ids       []string
 		mockTasks []Task
 		mockErr   error
 		wantErr   bool
@@ -39,11 +35,7 @@ func TestGetTasks(t *testing.T) {
 		{
 			name:      "success",
 			projectID: "123456789",
-			sectionID: "",
-			label:     "",
 			filter:    "",
-			lang:      "",
-			ids:       nil,
 			mockTasks: []Task{mockTask, mockTask},
 			mockErr:   nil,
 			wantErr:   false,
@@ -51,11 +43,7 @@ func TestGetTasks(t *testing.T) {
 		{
 			name:      "empty response",
 			projectID: "",
-			sectionID: "",
-			label:     "",
 			filter:    "",
-			lang:      "",
-			ids:       nil,
 			mockTasks: []Task{},
 			mockErr:   nil,
 			wantErr:   false,
@@ -63,11 +51,7 @@ func TestGetTasks(t *testing.T) {
 		{
 			name:      "api error",
 			projectID: "",
-			sectionID: "",
-			label:     "",
 			filter:    "",
-			lang:      "",
-			ids:       nil,
 			mockTasks: nil,
 			mockErr:   errors.New("api error"),
 			wantErr:   true,
@@ -85,7 +69,7 @@ func TestGetTasks(t *testing.T) {
 			})
 
 			// Call the method
-			tasks, err := client.GetTasks(tt.projectID, tt.sectionID, tt.label, tt.filter, tt.lang, tt.ids)
+			tasks, err := client.GetTasks(tt.projectID, tt.filter)
 
 			// Check error
 			if tt.wantErr {

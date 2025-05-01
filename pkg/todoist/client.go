@@ -56,9 +56,7 @@ type Task struct {
 	Content     string   `json:"content"`
 	Description string   `json:"description"`
 	ProjectID   string   `json:"project_id"`
-	SectionID   string   `json:"section_id,omitempty"`
 	ParentID    string   `json:"parent_id,omitempty"`
-	Labels      []string `json:"labels"`
 	Priority    int      `json:"priority"`
 	Due         *Due     `json:"due,omitempty"`
 	URL         string   `json:"url"`
@@ -94,31 +92,26 @@ type CreateTaskRequest struct {
 	Content     string   `json:"content"`
 	Description string   `json:"description,omitempty"`
 	ProjectID   string   `json:"project_id,omitempty"`
-	SectionID   string   `json:"section_id,omitempty"`
 	ParentID    string   `json:"parent_id,omitempty"`
 	Order       int      `json:"order,omitempty"`
-	Labels      []string `json:"labels,omitempty"`
 	Priority    int      `json:"priority,omitempty"`
 	DueString   string   `json:"due_string,omitempty"`
 	DueDate     string   `json:"due_date,omitempty"`
 	DueDatetime string   `json:"due_datetime,omitempty"`
-	DueLang     string   `json:"due_lang,omitempty"`
 }
 
 // UpdateTaskRequest represents the request to update a task
 type UpdateTaskRequest struct {
 	Content     string   `json:"content,omitempty"`
 	Description string   `json:"description,omitempty"`
-	Labels      []string `json:"labels,omitempty"`
 	Priority    int      `json:"priority,omitempty"`
 	DueString   string   `json:"due_string,omitempty"`
 	DueDate     string   `json:"due_date,omitempty"`
 	DueDatetime string   `json:"due_datetime,omitempty"`
-	DueLang     string   `json:"due_lang,omitempty"`
 }
 
 // GetTasks retrieves all active tasks
-func (c *Client) GetTasks(projectID, sectionID, label, filter, lang string, ids []string) ([]Task, error) {
+func (c *Client) GetTasks(projectID, filter string) ([]Task, error) {
 	endpoint := "/tasks"
 
 	req, err := http.NewRequest("GET", c.baseURL+endpoint, nil)
@@ -131,20 +124,8 @@ func (c *Client) GetTasks(projectID, sectionID, label, filter, lang string, ids 
 	if projectID != "" {
 		q.Add("project_id", projectID)
 	}
-	if sectionID != "" {
-		q.Add("section_id", sectionID)
-	}
-	if label != "" {
-		q.Add("label", label)
-	}
 	if filter != "" {
 		q.Add("filter", filter)
-	}
-	if lang != "" {
-		q.Add("lang", lang)
-	}
-	for _, id := range ids {
-		q.Add("ids", id)
 	}
 	req.URL.RawQuery = q.Encode()
 

@@ -71,9 +71,7 @@ func MockTask() *Task {
 		Content:     "Test Task",
 		Description: "This is a test task",
 		ProjectID:   "987654321",
-		SectionID:   "123123123",
 		ParentID:    "456456456",
-		Labels:      []string{"test", "mock"},
 		Priority:    4,
 		Due: &Due{
 			Date:        "2023-12-31",

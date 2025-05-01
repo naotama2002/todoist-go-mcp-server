@@ -68,30 +68,10 @@ func TestGetTasksTool(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, "string", projectId["type"])
 
-	// Check sectionId property
-	sectionId, ok := properties["sectionId"].(map[string]interface{})
-	assert.True(t, ok)
-	assert.Equal(t, "string", sectionId["type"])
-
-	// Check label property
-	label, ok := properties["label"].(map[string]interface{})
-	assert.True(t, ok)
-	assert.Equal(t, "string", label["type"])
-
 	// Check filter property
 	filter, ok := properties["filter"].(map[string]interface{})
 	assert.True(t, ok)
 	assert.Equal(t, "string", filter["type"])
-
-	// Check lang property
-	lang, ok := properties["lang"].(map[string]interface{})
-	assert.True(t, ok)
-	assert.Equal(t, "string", lang["type"])
-
-	// Check ids property
-	ids, ok := properties["ids"].(map[string]interface{})
-	assert.True(t, ok)
-	assert.Equal(t, "array", ids["type"])
 }
 
 func TestHandleGetTasks(t *testing.T) {
@@ -969,7 +949,7 @@ func TestOptionalStringArrayParam(t *testing.T) {
 				// Empty params
 			},
 			paramKey: "key",
-			want:     nil,
+			want:     []string{},
 			wantErr:  false,
 		},
 		{
