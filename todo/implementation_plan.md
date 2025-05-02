@@ -51,9 +51,9 @@ GitHub の github-mcp-server を参考にした構造で実装します。
     - [x] タスク更新
     - [x] タスク完了/再開
     - [x] タスク削除
-  - [ ] プロジェクト関連 API の実装
-    - [ ] プロジェクト一覧取得
-    - [ ] プロジェクト詳細取得
+  - [x] プロジェクト関連 API の実装
+    - [x] プロジェクト一覧取得
+    - [x] プロジェクト詳細取得
 
 ### 3. MCP ツールの実装 (3-4日目)
 
@@ -100,14 +100,14 @@ GitHub の github-mcp-server を参考にした構造で実装します。
   - [x] tasks_test.go
   - [x] projects_test.go
   - [x] server_test.go
-- [ ] 統合テストの実装
-- [ ] モックサーバの実装（必要に応じて）
 
 ### 7. ドキュメントの整備と最終調整 (7日目)
 
-- [ ] README.md の作成
-- [ ] API ドキュメントの更新
-- [ ] 使用例の追加
+- [x] README.md の作成
+  - https://github.com/github/github-mcp-server の実装を参考にしてください。/tmp/github-mcp-server に clone されています。
+  - MCP 利用ユーザが迷わない記述を心がけてください。
+- [x] API ドキュメントの更新
+- [x] 使用例の追加
 - [ ] コードのリファクタリングと最適化
 
 ## 実装の注意点
@@ -138,38 +138,33 @@ GitHub の github-mcp-server を参考にした構造で実装します。
 ## 実装状況（2025-04-27 更新）
 
 ### 完了した作業
-1. プロジェクト初期化と依存関係の設定
+1. プロジェクト構造の設定
+   - 基本的なディレクトリ構造の作成
    - Go モジュールの初期化
-   - 必要なライブラリの追加
-   - ディレクトリ構造の設定
+   - 必要なパッケージの追加
 
-2. Todoist API クライアントの基本実装
+2. Todoist API クライアントの実装
    - HTTP クライアントの実装
-   - 認証ヘッダーの設定
-   - エラーハンドリングの実装
+   - 認証機能の実装
    - タスク関連 API の実装
-     - タスク一覧取得
-     - タスク詳細取得
-     - タスク作成
-     - タスク更新
-     - タスク完了/再開
-     - タスク削除
+   - プロジェクト関連 API の実装
 
-3. MCP ツールの実装
-   - ツール定義の共通処理
-   - タスク管理ツールの実装
-     - `todoist_get_tasks` ツールの実装
-     - `todoist_get_task` ツールの実装
-     - `todoist_create_task` ツールの実装
-     - `todoist_update_task` ツールの実装
-     - `todoist_close_task` ツールの実装
-     - `todoist_delete_task` ツールの実装
+3. MCP サーバーの実装
+   - サーバー構造の実装
+   - HTTP モードと stdio モードのサポート
+   - ツールの登録機能
 
-4. MCP サーバの実装
-   - サーバの初期化
-   - ツールの登録
-   - HTTP モードと stdio モードの両方をサポート
-   - MCP プロトコルに準拠したリクエスト処理の実装
+4. MCP ツールの実装
+   - タスク管理ツール
+     - `todoist_get_tasks`
+     - `todoist_get_task`
+     - `todoist_create_task`
+     - `todoist_update_task`
+     - `todoist_close_task`
+     - `todoist_delete_task`
+   - プロジェクト管理ツール
+     - `todoist_get_projects`
+     - `todoist_get_project`
 
 5. ツールセットの実装
    - デフォルトツールセットの定義
@@ -181,18 +176,11 @@ GitHub の github-mcp-server を参考にした構造で実装します。
    - projects_test.go
    - server_test.go
 
-### 現在の動作確認状況
-- HTTP モードでのサーバ起動が可能
-- stdio モードでのサーバ起動が可能
-- すべてのタスク管理ツールが実装済み
-- MCP プロトコルに準拠したリクエスト処理が実装済み
-- Claude Desktop などの MCP クライアントから呼び出し可能
-- テスト用の MCP クライアントを実装し、コマンドライン引数からツール名と引数を指定可能
+7. ドキュメントの整備
+   - README.md の作成
+   - API ドキュメントの更新（docs/api.md）
+   - 使用例の追加（docs/examples.md）
 
-### 次のステップ
-1. プロジェクト管理ツールの実装
-   - `todoist_get_projects`
-   - `todoist_get_project`
+### 残りのタスク
 
-2. 統合テストの追加
-3. ドキュメントの整備
+1. コードのリファクタリングと最適化
