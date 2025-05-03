@@ -13,11 +13,11 @@ import (
 
 // Server represents a Todoist MCP server
 type Server struct {
-	mcpServer   *server.MCPServer
-	tools       *ToolProvider
-	logger      *logrus.Logger
-	httpServer  *http.Server
-	stdioServer *server.StdioServer
+	mcpServer    *server.MCPServer
+	tools        *ToolProvider
+	logger       *logrus.Logger
+	httpServer   *http.Server
+	stdioServer  *server.StdioServer
 	toolsetGroup *toolsets.ToolsetGroup
 }
 
@@ -47,10 +47,10 @@ func NewServer(token string, logger *logrus.Logger) *Server {
 	toolsetGroup := createDefaultToolsetGroup(tools, false)
 
 	return &Server{
-		mcpServer:   mcpServer,
-		tools:       tools,
-		logger:      logger,
-		stdioServer: stdioServer,
+		mcpServer:    mcpServer,
+		tools:        tools,
+		logger:       logger,
+		stdioServer:  stdioServer,
 		toolsetGroup: toolsetGroup,
 	}
 }
@@ -65,7 +65,7 @@ func createDefaultToolsetGroup(tp *ToolProvider, readOnly bool) *toolsets.Toolse
 		toolsets.NewServerTool(tp.GetTasks(), tp.HandleGetTasks),
 		toolsets.NewServerTool(tp.GetTask(), tp.HandleGetTask),
 	)
-	
+
 	if !readOnly {
 		taskToolset.AddWriteTools(
 			toolsets.NewServerTool(tp.CreateTask(), tp.HandleCreateTask),
@@ -87,7 +87,9 @@ func createDefaultToolsetGroup(tp *ToolProvider, readOnly bool) *toolsets.Toolse
 	group.AddToolset(projectToolset)
 
 	// Enable all toolsets by default
-	group.EnableToolsets([]string{"all"})
+	if err := group.EnableToolsets([]string{"all"}); err != nil {
+		return nil
+	}
 
 	return group
 }
@@ -103,7 +105,9 @@ func (s *Server) Start(addr string) error {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"status":"ok","message":"Todoist MCP Server is running"}`))
+			if _, err := w.Write([]byte(`{"status":"ok","message":"Todoist MCP Server is running"}`)); err != nil {
+				s.logger.Errorf("Error writing response: %v", err)
+			}
 			return
 		}
 
@@ -113,7 +117,11 @@ func (s *Server) Start(addr string) error {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		defer r.Body.Close()
+		defer func() {
+			if err := r.Body.Close(); err != nil {
+				s.logger.Errorf("Error closing request body: %v", err)
+			}
+		}()
 
 		// Handle MCP message
 		ctx := context.Background()
@@ -128,7 +136,9 @@ func (s *Server) Start(addr string) error {
 
 		// Write response
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(responseJSON)
+		if _, err := w.Write(responseJSON); err != nil {
+			s.logger.Errorf("Error writing response: %v", err)
+		}
 	})
 
 	s.httpServer = &http.Server{

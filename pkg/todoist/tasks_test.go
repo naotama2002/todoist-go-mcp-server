@@ -16,7 +16,7 @@ import (
 func NewMockToolProvider() *ToolProvider {
 	logger := logrus.New()
 	logger.SetOutput(nil) // Disable logging for tests
-	
+
 	return &ToolProvider{
 		client: NewMockClient(nil),
 		logger: logger,
@@ -78,7 +78,7 @@ func TestHandleGetTasks(t *testing.T) {
 	t.Skip("Skipping TestHandleGetTasks due to implementation issues")
 	// モックタスクのデリファレンス
 	mockTask := *MockTask()
-	
+
 	tests := []struct {
 		name       string
 		params     map[string]interface{}
@@ -102,15 +102,15 @@ func TestHandleGetTasks(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name: "success with no parameters",
-			params: map[string]interface{}{},
+			name:      "success with no parameters",
+			params:    map[string]interface{}{},
 			mockTasks: []Task{mockTask},
 			mockErr:   nil,
 			wantErr:   false,
 		},
 		{
-			name: "api error",
-			params: map[string]interface{}{},
+			name:      "api error",
+			params:    map[string]interface{}{},
 			mockTasks: nil,
 			mockErr:   errors.New("api error"),
 			wantErr:   true,
@@ -129,11 +129,10 @@ func TestHandleGetTasks(t *testing.T) {
 
 			// Create tool provider with mock client
 			tp := NewMockToolProviderWithHandlers()
-			tp.ToolProvider = &ToolProvider{
-				client: mockClient,
-				logger: logrus.New(),
-			}
-			tp.ToolProvider.logger.SetOutput(nil) // Disable logging for tests
+			tp.client = mockClient
+			logger := logrus.New()
+			logger.SetOutput(nil) // Disable logging for tests
+			tp.logger = logger
 
 			// Call the handler directly with the parameters
 			result, err := tp.HandleToolCall(context.Background(), "todoist_get_tasks", tt.params)
@@ -146,16 +145,16 @@ func TestHandleGetTasks(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.False(t, result.IsError)
-				
+
 				// TextContent にキャストして Text フィールドにアクセス
 				textContent, ok := result.Content[0].(*mcp.TextContent)
 				assert.True(t, ok)
-				
+
 				// Check that the response contains tasks
 				var response map[string]interface{}
 				err := json.Unmarshal([]byte(textContent.Text), &response)
 				assert.NoError(t, err)
-				
+
 				tasks, ok := response["tasks"]
 				assert.True(t, ok)
 				assert.NotNil(t, tasks)
@@ -201,7 +200,7 @@ func TestHandleGetTask(t *testing.T) {
 	t.Skip("Skipping TestHandleGetTask due to implementation issues")
 	// モックタスクのデリファレンス
 	mockTask := *MockTask()
-	
+
 	tests := []struct {
 		name       string
 		params     map[string]interface{}
@@ -220,8 +219,8 @@ func TestHandleGetTask(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "missing id",
-			params: map[string]interface{}{},
+			name:     "missing id",
+			params:   map[string]interface{}{},
 			mockTask: nil,
 			mockErr:  nil,
 			wantErr:  true,
@@ -249,11 +248,10 @@ func TestHandleGetTask(t *testing.T) {
 
 			// Create tool provider with mock client
 			tp := NewMockToolProviderWithHandlers()
-			tp.ToolProvider = &ToolProvider{
-				client: mockClient,
-				logger: logrus.New(),
-			}
-			tp.ToolProvider.logger.SetOutput(nil) // Disable logging for tests
+			tp.client = mockClient
+			logger := logrus.New()
+			logger.SetOutput(nil) // Disable logging for tests
+			tp.logger = logger
 
 			// Call the handler directly with the parameters
 			result, err := tp.HandleToolCall(context.Background(), "todoist_get_task", tt.params)
@@ -266,16 +264,16 @@ func TestHandleGetTask(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.False(t, result.IsError)
-				
+
 				// TextContent にキャストして Text フィールドにアクセス
 				textContent, ok := result.Content[0].(*mcp.TextContent)
 				assert.True(t, ok)
-				
+
 				// Check that the response contains task data
 				var task map[string]interface{}
 				err := json.Unmarshal([]byte(textContent.Text), &task)
 				assert.NoError(t, err)
-				
+
 				id, ok := task["id"]
 				assert.True(t, ok)
 				assert.Equal(t, "123456789", id)
@@ -326,7 +324,7 @@ func TestHandleCreateTask(t *testing.T) {
 	t.Skip("Skipping TestHandleCreateTask due to implementation issues")
 	// モックタスクのデリファレンス
 	mockTask := *MockTask()
-	
+
 	tests := []struct {
 		name       string
 		params     map[string]interface{}
@@ -364,8 +362,8 @@ func TestHandleCreateTask(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "missing content",
-			params: map[string]interface{}{},
+			name:     "missing content",
+			params:   map[string]interface{}{},
 			mockTask: nil,
 			mockErr:  nil,
 			wantErr:  true,
@@ -393,11 +391,10 @@ func TestHandleCreateTask(t *testing.T) {
 
 			// Create tool provider with mock client
 			tp := NewMockToolProviderWithHandlers()
-			tp.ToolProvider = &ToolProvider{
-				client: mockClient,
-				logger: logrus.New(),
-			}
-			tp.ToolProvider.logger.SetOutput(nil) // Disable logging for tests
+			tp.client = mockClient
+			logger := logrus.New()
+			logger.SetOutput(nil) // Disable logging for tests
+			tp.logger = logger
 
 			// Call the handler directly with the parameters
 			result, err := tp.HandleToolCall(context.Background(), "todoist_create_task", tt.params)
@@ -410,16 +407,16 @@ func TestHandleCreateTask(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.False(t, result.IsError)
-				
+
 				// TextContent にキャストして Text フィールドにアクセス
 				textContent, ok := result.Content[0].(*mcp.TextContent)
 				assert.True(t, ok)
-				
+
 				// Check that the response contains task data
 				var task map[string]interface{}
 				err := json.Unmarshal([]byte(textContent.Text), &task)
 				assert.NoError(t, err)
-				
+
 				id, ok := task["id"]
 				assert.True(t, ok)
 				assert.Equal(t, "123456789", id)
@@ -470,7 +467,7 @@ func TestHandleUpdateTask(t *testing.T) {
 	t.Skip("Skipping TestHandleUpdateTask due to implementation issues")
 	// モックタスクのデリファレンス
 	mockTask := *MockTask()
-	
+
 	tests := []struct {
 		name       string
 		params     map[string]interface{}
@@ -537,11 +534,10 @@ func TestHandleUpdateTask(t *testing.T) {
 
 			// Create tool provider with mock client
 			tp := NewMockToolProviderWithHandlers()
-			tp.ToolProvider = &ToolProvider{
-				client: mockClient,
-				logger: logrus.New(),
-			}
-			tp.ToolProvider.logger.SetOutput(nil) // Disable logging for tests
+			tp.client = mockClient
+			logger := logrus.New()
+			logger.SetOutput(nil) // Disable logging for tests
+			tp.logger = logger
 
 			// Call the handler directly with the parameters
 			result, err := tp.HandleToolCall(context.Background(), "todoist_update_task", tt.params)
@@ -554,16 +550,16 @@ func TestHandleUpdateTask(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.False(t, result.IsError)
-				
+
 				// TextContent にキャストして Text フィールドにアクセス
 				textContent, ok := result.Content[0].(*mcp.TextContent)
 				assert.True(t, ok)
-				
+
 				// Check that the response contains task data
 				var task map[string]interface{}
 				err := json.Unmarshal([]byte(textContent.Text), &task)
 				assert.NoError(t, err)
-				
+
 				id, ok := task["id"]
 				assert.True(t, ok)
 				assert.Equal(t, "123456789", id)
@@ -623,12 +619,12 @@ func TestHandleCloseTask(t *testing.T) {
 			mockResp: map[string]interface{}{
 				"success": true,
 			},
-			mockErr:  nil,
-			wantErr:  false,
+			mockErr: nil,
+			wantErr: false,
 		},
 		{
-			name: "missing id",
-			params: map[string]interface{}{},
+			name:     "missing id",
+			params:   map[string]interface{}{},
 			mockResp: nil,
 			mockErr:  nil,
 			wantErr:  true,
@@ -656,11 +652,10 @@ func TestHandleCloseTask(t *testing.T) {
 
 			// Create tool provider with mock client
 			tp := NewMockToolProviderWithHandlers()
-			tp.ToolProvider = &ToolProvider{
-				client: mockClient,
-				logger: logrus.New(),
-			}
-			tp.ToolProvider.logger.SetOutput(nil) // Disable logging for tests
+			tp.client = mockClient
+			logger := logrus.New()
+			logger.SetOutput(nil) // Disable logging for tests
+			tp.logger = logger
 
 			// Call the handler directly with the parameters
 			result, err := tp.HandleToolCall(context.Background(), "todoist_close_task", tt.params)
@@ -673,16 +668,16 @@ func TestHandleCloseTask(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.False(t, result.IsError)
-				
+
 				// TextContent にキャストして Text フィールドにアクセス
 				textContent, ok := result.Content[0].(*mcp.TextContent)
 				assert.True(t, ok)
-				
+
 				// Check that the response contains success message
 				var response map[string]interface{}
 				err := json.Unmarshal([]byte(textContent.Text), &response)
 				assert.NoError(t, err)
-				
+
 				success, ok := response["success"]
 				assert.True(t, ok)
 				assert.Equal(t, true, success)
@@ -742,12 +737,12 @@ func TestHandleDeleteTask(t *testing.T) {
 			mockResp: map[string]interface{}{
 				"success": true,
 			},
-			mockErr:  nil,
-			wantErr:  false,
+			mockErr: nil,
+			wantErr: false,
 		},
 		{
-			name: "missing id",
-			params: map[string]interface{}{},
+			name:     "missing id",
+			params:   map[string]interface{}{},
 			mockResp: nil,
 			mockErr:  nil,
 			wantErr:  true,
@@ -775,11 +770,10 @@ func TestHandleDeleteTask(t *testing.T) {
 
 			// Create tool provider with mock client
 			tp := NewMockToolProviderWithHandlers()
-			tp.ToolProvider = &ToolProvider{
-				client: mockClient,
-				logger: logrus.New(),
-			}
-			tp.ToolProvider.logger.SetOutput(nil) // Disable logging for tests
+			tp.client = mockClient
+			logger := logrus.New()
+			logger.SetOutput(nil) // Disable logging for tests
+			tp.logger = logger
 
 			// Call the handler directly with the parameters
 			result, err := tp.HandleToolCall(context.Background(), "todoist_delete_task", tt.params)
@@ -792,16 +786,16 @@ func TestHandleDeleteTask(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
 				assert.False(t, result.IsError)
-				
+
 				// TextContent にキャストして Text フィールドにアクセス
 				textContent, ok := result.Content[0].(*mcp.TextContent)
 				assert.True(t, ok)
-				
+
 				// Check that the response contains success message
 				var response map[string]interface{}
 				err := json.Unmarshal([]byte(textContent.Text), &response)
 				assert.NoError(t, err)
-				
+
 				success, ok := response["success"]
 				assert.True(t, ok)
 				assert.Equal(t, true, success)
@@ -828,7 +822,7 @@ func TestOptionalParam(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "parameter does not exist",
+			name:   "parameter does not exist",
 			params: map[string]interface{}{
 				// Empty params
 			},
@@ -886,7 +880,7 @@ func TestRequiredParam(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "parameter does not exist",
+			name:   "parameter does not exist",
 			params: map[string]interface{}{
 				// Empty params
 			},
@@ -944,7 +938,7 @@ func TestOptionalStringArrayParam(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "parameter does not exist",
+			name:   "parameter does not exist",
 			params: map[string]interface{}{
 				// Empty params
 			},

@@ -23,7 +23,7 @@ func TestNewClient(t *testing.T) {
 func TestGetTasks(t *testing.T) {
 	// モックタスクのデリファレンス
 	mockTask := *MockTask()
-	
+
 	tests := []struct {
 		name      string
 		projectID string
@@ -89,7 +89,7 @@ func TestGetTasks(t *testing.T) {
 func TestGetTask(t *testing.T) {
 	// モックタスクを取得
 	mockTask := MockTask()
-	
+
 	tests := []struct {
 		name     string
 		id       string
@@ -146,7 +146,7 @@ func TestGetTask(t *testing.T) {
 func TestCreateTask(t *testing.T) {
 	// モックタスクを取得
 	mockTask := MockTask()
-	
+
 	tests := []struct {
 		name     string
 		req      CreateTaskRequest
@@ -208,7 +208,7 @@ func TestCreateTask(t *testing.T) {
 func TestUpdateTask(t *testing.T) {
 	// モックタスクを取得
 	mockTask := MockTask()
-	
+
 	tests := []struct {
 		name     string
 		id       string
@@ -360,7 +360,7 @@ func TestDeleteTask(t *testing.T) {
 func TestGetProjects(t *testing.T) {
 	// モックプロジェクトのデリファレンス
 	mockProject := *MockProject()
-	
+
 	tests := []struct {
 		name         string
 		mockProjects []Project
@@ -418,7 +418,7 @@ func TestGetProjects(t *testing.T) {
 func TestGetProject(t *testing.T) {
 	// モックプロジェクトを取得
 	mockProject := MockProject()
-	
+
 	tests := []struct {
 		name        string
 		id          string
