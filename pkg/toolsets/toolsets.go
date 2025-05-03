@@ -148,7 +148,7 @@ func (tg *ToolsetGroup) EnableToolsets(names []string) error {
 			return err
 		}
 	}
-	
+
 	if tg.everythingOn {
 		for name := range tg.Toolsets {
 			err := tg.EnableToolset(name)

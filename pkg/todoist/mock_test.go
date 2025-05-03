@@ -112,7 +112,7 @@ func NewMockToolProviderWithHandlers() *MockToolProviderWithHandlers {
 	// Create a mock client that returns successful responses for all requests
 	mockClient := NewMockClient(func(req *http.Request) (*http.Response, error) {
 		var responseData interface{}
-		
+
 		// Determine the response data based on the request path
 		switch req.URL.Path {
 		case "/tasks":
@@ -133,16 +133,16 @@ func NewMockToolProviderWithHandlers() *MockToolProviderWithHandlers {
 				"success": true,
 			}
 		}
-		
+
 		return MockResponse(200, responseData), nil
 	})
-	
+
 	// Create a tool provider with the mock client
 	provider := &ToolProvider{
 		client: mockClient,
 		logger: nil,
 	}
-	
+
 	return &MockToolProviderWithHandlers{
 		ToolProvider: provider,
 	}
@@ -152,7 +152,7 @@ func NewMockToolProviderWithHandlers() *MockToolProviderWithHandlers {
 func (m *MockToolProviderWithHandlers) HandleToolCall(ctx context.Context, toolName string, params map[string]interface{}) (*mcp.CallToolResult, error) {
 	// Create a mock result based on the tool name
 	var content string
-	
+
 	switch toolName {
 	case "todoist_get_tasks":
 		content = `{"tasks":[{"id":"123456789","content":"Test Task"}]}`
@@ -177,7 +177,7 @@ func (m *MockToolProviderWithHandlers) HandleToolCall(ctx context.Context, toolN
 	default:
 		return nil, errors.New("unknown tool: " + toolName)
 	}
-	
+
 	// Create the result
 	result := &mcp.CallToolResult{
 		Content: []mcp.Content{
@@ -185,6 +185,6 @@ func (m *MockToolProviderWithHandlers) HandleToolCall(ctx context.Context, toolN
 		},
 		IsError: false,
 	}
-	
+
 	return result, nil
 }

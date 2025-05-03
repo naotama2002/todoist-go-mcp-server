@@ -52,14 +52,14 @@ func NewClient(token string, logger *logrus.Logger) *Client {
 
 // Task represents a Todoist task
 type Task struct {
-	ID          string   `json:"id"`
-	Content     string   `json:"content"`
-	Description string   `json:"description"`
-	ProjectID   string   `json:"project_id"`
-	ParentID    string   `json:"parent_id,omitempty"`
-	Priority    int      `json:"priority"`
-	Due         *Due     `json:"due,omitempty"`
-	URL         string   `json:"url"`
+	ID          string `json:"id"`
+	Content     string `json:"content"`
+	Description string `json:"description"`
+	ProjectID   string `json:"project_id"`
+	ParentID    string `json:"parent_id,omitempty"`
+	Priority    int    `json:"priority"`
+	Due         *Due   `json:"due,omitempty"`
+	URL         string `json:"url"`
 }
 
 // Due represents a due date for a task
@@ -89,25 +89,25 @@ type Project struct {
 
 // CreateTaskRequest represents the request to create a task
 type CreateTaskRequest struct {
-	Content     string   `json:"content"`
-	Description string   `json:"description,omitempty"`
-	ProjectID   string   `json:"project_id,omitempty"`
-	ParentID    string   `json:"parent_id,omitempty"`
-	Order       int      `json:"order,omitempty"`
-	Priority    int      `json:"priority,omitempty"`
-	DueString   string   `json:"due_string,omitempty"`
-	DueDate     string   `json:"due_date,omitempty"`
-	DueDatetime string   `json:"due_datetime,omitempty"`
+	Content     string `json:"content"`
+	Description string `json:"description,omitempty"`
+	ProjectID   string `json:"project_id,omitempty"`
+	ParentID    string `json:"parent_id,omitempty"`
+	Order       int    `json:"order,omitempty"`
+	Priority    int    `json:"priority,omitempty"`
+	DueString   string `json:"due_string,omitempty"`
+	DueDate     string `json:"due_date,omitempty"`
+	DueDatetime string `json:"due_datetime,omitempty"`
 }
 
 // UpdateTaskRequest represents the request to update a task
 type UpdateTaskRequest struct {
-	Content     string   `json:"content,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Priority    int      `json:"priority,omitempty"`
-	DueString   string   `json:"due_string,omitempty"`
-	DueDate     string   `json:"due_date,omitempty"`
-	DueDatetime string   `json:"due_datetime,omitempty"`
+	Content     string `json:"content,omitempty"`
+	Description string `json:"description,omitempty"`
+	Priority    int    `json:"priority,omitempty"`
+	DueString   string `json:"due_string,omitempty"`
+	DueDate     string `json:"due_date,omitempty"`
+	DueDatetime string `json:"due_datetime,omitempty"`
 }
 
 // GetTasks retrieves all active tasks
@@ -137,7 +137,11 @@ func (c *Client) GetTasks(projectID, filter string) ([]Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK {
@@ -171,7 +175,11 @@ func (c *Client) GetTask(id string) (*Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK {
@@ -205,7 +213,11 @@ func (c *Client) GetProjects() ([]Project, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK {
@@ -239,7 +251,11 @@ func (c *Client) GetProject(id string) (*Project, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK {
@@ -281,7 +297,11 @@ func (c *Client) CreateTask(req CreateTaskRequest) (*Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK {
@@ -323,7 +343,11 @@ func (c *Client) UpdateTask(id string, req UpdateTaskRequest) (*Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK {
@@ -358,7 +382,11 @@ func (c *Client) CloseTask(id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusNoContent {
@@ -387,7 +415,11 @@ func (c *Client) ReopenTask(id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusNoContent {
@@ -416,7 +448,11 @@ func (c *Client) DeleteTask(id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			c.logger.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	// Check response status
 	if resp.StatusCode != http.StatusNoContent {

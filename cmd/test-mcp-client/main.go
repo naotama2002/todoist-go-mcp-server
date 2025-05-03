@@ -116,7 +116,11 @@ func main() {
 		fmt.Printf("HTTP リクエストの送信に失敗しました: %v\n", err)
 		os.Exit(1)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Printf("レスポンスボディのクローズに失敗しました: %v\n", err)
+		}
+	}()
 
 	// レスポンスを読み取り
 	body, err := io.ReadAll(resp.Body)

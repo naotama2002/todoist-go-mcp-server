@@ -53,3 +53,6 @@ __debug_bin
 # Go Workspaceファイル
 go.work
 go.work.sum
+
+# Projects
+build/
