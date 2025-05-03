@@ -251,14 +251,11 @@ To use the Todoist MCP Server with Claude Desktop, you need to add it to your Cl
 
 ### Build from source
 
-You can use `go build` to build the binary:
+You can use `make build` to build the binary:
 
 ```bash
 # Build the binary
-go build -o todoist-mcp-server ./cmd/todoist-mcp-server
-
-# Move the binary to a location in your PATH (optional)
-sudo mv todoist-mcp-server /usr/local/bin/
+make build
 ```
 
 ### Configuration
@@ -396,5 +393,5 @@ todoist-go-mcp-server/
 ### Running Tests
 
 ```bash
-go test ./...
+make test
 ```
