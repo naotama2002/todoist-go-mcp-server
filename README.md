@@ -319,9 +319,26 @@ todoist-mcp-server --mode http --addr :8080
 
 #### Stdio Mode
 
-Alternatively, you can configure Claude Desktop to directly execute the binary in stdio mode:
+Claude Desktop / Cline, Roo Cline / Windsurf
 
 ```json
+{
+  "mcpServers": {
+    "github": {
+      "todoist": {
+        "command": "/path/to/todoist-mcp-server",
+        "args": ["--mode", "stdio"],
+        "env": {
+          "TODOIST_API_TOKEN": "<YOUR_TODOIST_API_TOKEN>"
+        }
+      }
+    }
+  }
+}
+```
+
+VSCode
+```
 {
   "mcp": {
     "servers": {
@@ -339,9 +356,9 @@ Alternatively, you can configure Claude Desktop to directly execute the binary i
 
 Replace `/path/to/todoist-mcp-server` with the actual path to the binary and `<YOUR_TODOIST_API_TOKEN>` with your Todoist API token.
 
-3. In Claude Desktop, go to Settings > Tools > Add Tool, and paste the appropriate JSON configuration.
+1. In Claude Desktop, go to Settings > Tools > Add Tool, and paste the appropriate JSON configuration.
 
-4. Save the configuration and restart Claude Desktop if necessary.
+2. Save the configuration and restart Claude Desktop if necessary.
 
 Now you can ask Claude to manage your Todoist tasks and projects using natural language.
 
