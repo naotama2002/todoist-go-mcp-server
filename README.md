@@ -249,9 +249,41 @@ Example:
 
 To use the Todoist MCP Server with Claude Desktop, you need to add it to your Claude Desktop configuration.
 
+### Download from GitHub Releases
+
+The easiest way to get started is to download a pre-built binary from the [GitHub Releases page](https://github.com/naotama2002/todoist-go-mcp-server/releases):
+
+1. Go to the [Releases page](https://github.com/naotama2002/todoist-go-mcp-server/releases) and download the latest release for your platform:
+   - Linux: `todoist-mcp-server_Linux_x86_64.tar.gz` or `todoist-mcp-server_Linux_arm64.tar.gz`
+   - macOS: `todoist-mcp-server_Darwin_x86_64.tar.gz` or `todoist-mcp-server_Darwin_arm64.tar.gz`
+   - Windows: `todoist-mcp-server_Windows_x86_64.zip`
+
+2. Extract the archive to get the `todoist-mcp-server` binary:
+   ```bash
+   # For Linux/macOS
+   tar -xzf todoist-mcp-server_*_*.tar.gz
+   
+   # For Windows
+   # Extract the zip file using Windows Explorer or a tool like 7-Zip
+   ```
+
+3. Make the binary executable (Linux/macOS only):
+   ```bash
+   chmod +x todoist-mcp-server
+   ```
+
+4. Optionally, move the binary to a location in your PATH:
+   ```bash
+   # Linux/macOS
+   sudo mv todoist-mcp-server /usr/local/bin/
+   
+   # Windows
+   # Move the .exe file to a location in your PATH
+   ```
+
 ### Build from source
 
-You can use `make build` to build the binary:
+Alternatively, you can build the binary from source:
 
 ```bash
 # Build the binary
