@@ -20,7 +20,7 @@ func main() {
 	logger := log.NewLogger()
 
 	// クライアントを作成
-	client := todoist.NewClient(token, logger)
+	client := todoist.NewClient(token, todoist.WithLogger(logger))
 
 	// タスクを取得
 	tasks, err := client.GetTasks("", "")

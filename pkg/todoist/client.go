@@ -1,8 +1,6 @@
 package todoist
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,438 +25,112 @@ type Client struct {
 	logger     *logrus.Logger
 }
 
+// ClientOption is a function that configures a Client
+type ClientOption func(*Client)
+
+// WithTimeout sets the timeout for the HTTP client
+func WithTimeout(timeout time.Duration) ClientOption {
+	return func(c *Client) {
+		c.httpClient.Timeout = timeout
+	}
+}
+
+// WithBaseURL sets the base URL for the Todoist API
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) {
+		c.baseURL = baseURL
+	}
+}
+
+// WithLogger sets the logger for the client
+func WithLogger(logger *logrus.Logger) ClientOption {
+	return func(c *Client) {
+		c.logger = logger
+	}
+}
+
 // NewClient creates a new Todoist API client
-func NewClient(token string, logger *logrus.Logger) *Client {
+func NewClient(token string, options ...ClientOption) *Client {
 	if token == "" {
 		token = os.Getenv("TODOIST_API_TOKEN")
 	}
 
-	if logger == nil {
-		logger = logrus.New()
-		logger.SetFormatter(&logrus.TextFormatter{
-			FullTimestamp: true,
-		})
-	}
+	logger := logrus.New()
+	logger.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
 
-	return &Client{
+	client := &Client{
 		httpClient: &http.Client{
 			Timeout: DefaultTimeout,
+			Transport: &http.Transport{
+				MaxIdleConns:        100,
+				MaxIdleConnsPerHost: 100,
+				IdleConnTimeout:     90 * time.Second,
+			},
 		},
 		token:   token,
 		baseURL: TodoistAPIBaseURL,
 		logger:  logger,
 	}
+
+	// Apply options
+	for _, option := range options {
+		option(client)
+	}
+
+	return client
 }
 
-// Task represents a Todoist task
-type Task struct {
-	ID          string `json:"id"`
-	Content     string `json:"content"`
-	Description string `json:"description"`
-	ProjectID   string `json:"project_id"`
-	ParentID    string `json:"parent_id,omitempty"`
-	Priority    int    `json:"priority"`
-	Due         *Due   `json:"due,omitempty"`
-	URL         string `json:"url"`
-}
-
-// Due represents a due date for a task
-type Due struct {
-	Date        string `json:"date"`
-	IsRecurring bool   `json:"is_recurring"`
-	Datetime    string `json:"datetime,omitempty"`
-	String      string `json:"string,omitempty"`
-	Timezone    string `json:"timezone,omitempty"`
-}
-
-// Project represents a Todoist project
-type Project struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
-	CommentCount   int    `json:"comment_count"`
-	Order          int    `json:"order"`
-	Color          string `json:"color"`
-	IsShared       bool   `json:"is_shared"`
-	IsFavorite     bool   `json:"is_favorite"`
-	IsInboxProject bool   `json:"is_inbox_project"`
-	IsTeamInbox    bool   `json:"is_team_inbox"`
-	ViewStyle      string `json:"view_style"`
-	URL            string `json:"url"`
-	ParentID       string `json:"parent_id,omitempty"`
-}
-
-// CreateTaskRequest represents the request to create a task
-type CreateTaskRequest struct {
-	Content     string `json:"content"`
-	Description string `json:"description,omitempty"`
-	ProjectID   string `json:"project_id,omitempty"`
-	ParentID    string `json:"parent_id,omitempty"`
-	Order       int    `json:"order,omitempty"`
-	Priority    int    `json:"priority,omitempty"`
-	DueString   string `json:"due_string,omitempty"`
-	DueDate     string `json:"due_date,omitempty"`
-	DueDatetime string `json:"due_datetime,omitempty"`
-}
-
-// UpdateTaskRequest represents the request to update a task
-type UpdateTaskRequest struct {
-	Content     string `json:"content,omitempty"`
-	Description string `json:"description,omitempty"`
-	Priority    int    `json:"priority,omitempty"`
-	DueString   string `json:"due_string,omitempty"`
-	DueDate     string `json:"due_date,omitempty"`
-	DueDatetime string `json:"due_datetime,omitempty"`
-}
-
-// GetTasks retrieves all active tasks
-func (c *Client) GetTasks(projectID, filter string) ([]Task, error) {
-	endpoint := "/tasks"
-
-	req, err := http.NewRequest("GET", c.baseURL+endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add query parameters if provided
-	q := req.URL.Query()
-	if projectID != "" {
-		q.Add("project_id", projectID)
-	}
-	if filter != "" {
-		q.Add("filter", filter)
-	}
-	req.URL.RawQuery = q.Encode()
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	// Parse response
-	var tasks []Task
-	if err := json.NewDecoder(resp.Body).Decode(&tasks); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return tasks, nil
-}
-
-// GetTask retrieves a specific task by ID
-func (c *Client) GetTask(id string) (*Task, error) {
-	endpoint := fmt.Sprintf("/tasks/%s", id)
-
-	req, err := http.NewRequest("GET", c.baseURL+endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	// Parse response
-	var task Task
-	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &task, nil
-}
-
-// GetProjects retrieves all projects
-func (c *Client) GetProjects() ([]Project, error) {
-	endpoint := "/projects"
-
-	req, err := http.NewRequest("GET", c.baseURL+endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	// Parse response
-	var projects []Project
-	if err := json.NewDecoder(resp.Body).Decode(&projects); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return projects, nil
-}
-
-// GetProject retrieves a specific project by ID
-func (c *Client) GetProject(id string) (*Project, error) {
-	endpoint := fmt.Sprintf("/projects/%s", id)
-
-	req, err := http.NewRequest("GET", c.baseURL+endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	// Parse response
-	var project Project
-	if err := json.NewDecoder(resp.Body).Decode(&project); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &project, nil
-}
-
-// CreateTask creates a new task
-func (c *Client) CreateTask(req CreateTaskRequest) (*Task, error) {
-	endpoint := "/tasks"
-
-	// Convert request to JSON
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
-	}
-
+// doRequest performs an HTTP request and returns the response
+func (c *Client) doRequest(method, endpoint string, body io.Reader) (*http.Response, error) {
 	// Create request
-	httpReq, err := http.NewRequest("POST", c.baseURL+endpoint, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest(method, c.baseURL+endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	// Add headers
-	httpReq.Header.Add("Authorization", "Bearer "+c.token)
-	httpReq.Header.Add("Content-Type", "application/json")
+	// Add authorization header
+	req.Header.Add("Authorization", "Bearer "+c.token)
+
+	// Add content type for requests with body
+	if body != nil {
+		req.Header.Add("Content-Type", "application/json")
+	}
 
 	// Execute the request
-	resp, err := c.httpClient.Do(httpReq)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
+
+	return resp, nil
+}
+
+// processResponse processes the HTTP response and handles errors
+func (c *Client) processResponse(resp *http.Response, expectedStatus int) ([]byte, error) {
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
+			c.logger.WithError(err).Error("Error closing response body")
 		}
 	}()
 
 	// Check response status
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != expectedStatus {
 		bodyBytes, _ := io.ReadAll(resp.Body)
 		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
 	}
 
-	// Parse response
-	var task Task
-	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+	// For status codes that don't return content (like 204 No Content)
+	if expectedStatus == http.StatusNoContent {
+		return nil, nil
 	}
 
-	return &task, nil
-}
-
-// UpdateTask updates an existing task
-func (c *Client) UpdateTask(id string, req UpdateTaskRequest) (*Task, error) {
-	endpoint := fmt.Sprintf("/tasks/%s", id)
-
-	// Convert request to JSON
-	reqBody, err := json.Marshal(req)
+	// Read response body
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	// Create request
-	httpReq, err := http.NewRequest("POST", c.baseURL+endpoint, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add headers
-	httpReq.Header.Add("Authorization", "Bearer "+c.token)
-	httpReq.Header.Add("Content-Type", "application/json")
-
-	// Execute the request
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	// Parse response
-	var task Task
-	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &task, nil
-}
-
-// CloseTask marks a task as completed
-func (c *Client) CloseTask(id string) error {
-	endpoint := fmt.Sprintf("/tasks/%s/close", id)
-
-	// Create request
-	req, err := http.NewRequest("POST", c.baseURL+endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusNoContent {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	return nil
-}
-
-// ReopenTask marks a task as not completed
-func (c *Client) ReopenTask(id string) error {
-	endpoint := fmt.Sprintf("/tasks/%s/reopen", id)
-
-	// Create request
-	req, err := http.NewRequest("POST", c.baseURL+endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusNoContent {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	return nil
-}
-
-// DeleteTask deletes a task
-func (c *Client) DeleteTask(id string) error {
-	endpoint := fmt.Sprintf("/tasks/%s", id)
-
-	// Create request
-	req, err := http.NewRequest("DELETE", c.baseURL+endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Add authorization header
-	req.Header.Add("Authorization", "Bearer "+c.token)
-
-	// Execute the request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			c.logger.Printf("Error closing response body: %v", err)
-		}
-	}()
-
-	// Check response status
-	if resp.StatusCode != http.StatusNoContent {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	return nil
+	return bodyBytes, nil
 }

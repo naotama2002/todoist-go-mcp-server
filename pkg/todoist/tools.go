@@ -7,14 +7,23 @@ import (
 
 // ToolProvider provides MCP tools for Todoist
 type ToolProvider struct {
-	client *Client
+	client TodoistClient
 	logger *logrus.Logger
 }
 
 // NewToolProvider creates a new ToolProvider
 func NewToolProvider(token string, logger *logrus.Logger) *ToolProvider {
+	if logger == nil {
+		logger = logrus.New()
+		logger.SetFormatter(&logrus.TextFormatter{
+			FullTimestamp: true,
+		})
+	}
+
+	client := NewClient(token, WithLogger(logger))
+
 	return &ToolProvider{
-		client: NewClient(token, logger),
+		client: client,
 		logger: logger,
 	}
 }
@@ -57,10 +66,4 @@ func (tp *ToolProvider) GetTools() []server.ServerTool {
 		},
 		// Add other tools here
 	}
-}
-
-// ErrorResponse represents an error response
-type ErrorResponse struct {
-	Error string `json:"error"`
-	Code  int    `json:"code"`
 }
