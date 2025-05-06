@@ -11,13 +11,15 @@ import (
 
 func TestNewClient(t *testing.T) {
 	// Create a client with a valid token
-	client := NewClient("valid_token", logrus.New())
+	logger := logrus.New()
+	client := NewClient("valid_token", WithLogger(logger))
 
 	// Check that the client was created correctly
 	assert.NotNil(t, client)
 	assert.Equal(t, "valid_token", client.token)
 	assert.Equal(t, "https://api.todoist.com/rest/v2", client.baseURL)
 	assert.NotNil(t, client.httpClient)
+	assert.Equal(t, logger, client.logger)
 }
 
 func TestGetTasks(t *testing.T) {

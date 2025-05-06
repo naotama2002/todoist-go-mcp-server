@@ -57,7 +57,8 @@ func NewMockClient(doFunc func(req *http.Request) (*http.Response, error)) *Clie
 		DoFunc: doFunc,
 	}
 
-	client := NewClient("test-token", nil)
+	// Create a client with the function option pattern
+	client := NewClient("test-token")
 	client.httpClient = &http.Client{
 		Transport: mockClient,
 	}
