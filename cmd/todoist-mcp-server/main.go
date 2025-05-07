@@ -37,35 +37,34 @@ func main() {
 	defer stop()
 
 	// Start the server based on the mode
+	errCh := make(chan error, 1)
+
 	switch *mode {
 	case "http":
 		// Start the server in HTTP mode
 		logger.WithField("addr", *addr).Info("Starting Todoist MCP server in HTTP mode")
-		if err := server.Start(*addr); err != nil {
-			logger.WithError(err).Fatal("Failed to start server")
-		}
+		go func() {
+			errCh <- server.Start(ctx, *addr)
+		}()
 	case "stdio":
 		// Start the server in stdio mode
 		logger.Info("Starting Todoist MCP server in stdio mode")
-
-		// Create channels for errors
-		errCh := make(chan error, 1)
-
-		// Start the server in a goroutine
 		go func() {
 			errCh <- server.StartStdio(ctx, os.Stdin, os.Stdout)
 		}()
-
-		// Wait for shutdown signal or error
-		select {
-		case <-ctx.Done():
-			logger.Info("Shutting down...")
-		case err := <-errCh:
-			if err != nil {
-				logger.WithError(err).Fatal("Failed to run server")
-			}
-		}
 	default:
 		logger.Fatalf("Invalid mode: %s. Must be 'http' or 'stdio'", *mode)
+	}
+
+	// Wait for shutdown signal or error
+	select {
+	case <-ctx.Done():
+		logger.Info("Shutting down server due to signal...")
+	case err := <-errCh:
+		if err != nil {
+			logger.WithError(err).Fatal("Server failed to run")
+		} else {
+			logger.Info("Server stopped gracefully.")
+		}
 	}
 }

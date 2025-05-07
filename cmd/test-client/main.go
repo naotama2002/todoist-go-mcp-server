@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -23,7 +24,7 @@ func main() {
 	client := todoist.NewClient(token, todoist.WithLogger(logger))
 
 	// タスクを取得
-	tasks, err := client.GetTasks("", "")
+	tasks, err := client.GetTasks(context.Background(), "", "")
 	if err != nil {
 		logger.WithError(err).Error("タスクの取得に失敗しました")
 		os.Exit(1)

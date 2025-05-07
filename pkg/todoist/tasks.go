@@ -123,7 +123,7 @@ func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallTool
 	}).Info("Getting tasks")
 
 	// Call the Todoist API
-	tasks, err := tp.client.GetTasks(projectID, filter)
+	tasks, err := tp.client.GetTasks(ctx, projectID, filter)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get tasks")
 		return mcp.NewToolResultErrorFromErr("Failed to get tasks", err), nil
@@ -190,7 +190,7 @@ func (tp *ToolProvider) HandleGetTask(ctx context.Context, request mcp.CallToolR
 	}).Info("Getting task")
 
 	// Call the Todoist API
-	task, err := tp.client.GetTask(id)
+	task, err := tp.client.GetTask(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get task")
 		return mcp.NewToolResultErrorFromErr("Failed to get task", err), nil
@@ -314,7 +314,7 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 	}
 
 	// Call the Todoist API
-	task, err := tp.client.CreateTask(createReq)
+	task, err := tp.client.CreateTask(ctx, createReq)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to create task")
 		return mcp.NewToolResultErrorFromErr("Failed to create task", err), nil
@@ -424,7 +424,7 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 	}
 
 	// Call the Todoist API
-	task, err := tp.client.UpdateTask(id, updateReq)
+	task, err := tp.client.UpdateTask(ctx, id, updateReq)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to update task")
 		return mcp.NewToolResultErrorFromErr("Failed to update task", err), nil
@@ -488,7 +488,7 @@ func (tp *ToolProvider) HandleCloseTask(ctx context.Context, request mcp.CallToo
 	}).Info("Closing task")
 
 	// Call the Todoist API
-	err = tp.client.CloseTask(id)
+	err = tp.client.CloseTask(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to close task")
 		return mcp.NewToolResultErrorFromErr("Failed to close task", err), nil
@@ -543,7 +543,7 @@ func (tp *ToolProvider) HandleDeleteTask(ctx context.Context, request mcp.CallTo
 	}).Info("Deleting task")
 
 	// Call the Todoist API
-	err = tp.client.DeleteTask(id)
+	err = tp.client.DeleteTask(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to delete task")
 		return mcp.NewToolResultErrorFromErr("Failed to delete task", err), nil
