@@ -1,6 +1,7 @@
 package todoist
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -83,9 +84,9 @@ func NewClient(token string, options ...ClientOption) *Client {
 }
 
 // doRequest performs an HTTP request and returns the response
-func (c *Client) doRequest(method, endpoint string, body io.Reader) (*http.Response, error) {
+func (c *Client) doRequest(ctx context.Context, method, endpoint string, body io.Reader) (*http.Response, error) {
 	// Create request
-	req, err := http.NewRequest(method, c.baseURL+endpoint, body)
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+endpoint, body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/mark3labs/mcp-go/server"
 	"github.com/naotama2002/todoist-go-mcp-server/pkg/toolsets"
@@ -95,7 +96,7 @@ func createDefaultToolsetGroup(tp *ToolProvider, readOnly bool) *toolsets.Toolse
 }
 
 // Start starts the Todoist MCP server over HTTP
-func (s *Server) Start(addr string) error {
+func (s *Server) Start(ctx context.Context, addr string) error {
 	// Register tools using toolset group
 	s.toolsetGroup.RegisterTools(s.mcpServer)
 	s.logger.Info("Registered tools from toolset group")
@@ -124,8 +125,7 @@ func (s *Server) Start(addr string) error {
 		}()
 
 		// Handle MCP message
-		ctx := context.Background()
-		response := s.mcpServer.HandleMessage(ctx, body)
+		response := s.mcpServer.HandleMessage(r.Context(), body)
 
 		// Convert response to JSON
 		responseJSON, err := json.Marshal(response)
@@ -146,9 +146,27 @@ func (s *Server) Start(addr string) error {
 		Handler: mux,
 	}
 
-	// Start the server
-	s.logger.WithField("addr", addr).Info("Starting Todoist MCP server over HTTP")
-	return s.httpServer.ListenAndServe()
+	// Start the server in a goroutine
+	go func() {
+		s.logger.WithField("addr", addr).Info("Starting Todoist MCP server over HTTP")
+		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			s.logger.WithError(err).Fatal("HTTP server ListenAndServe error")
+		}
+	}()
+
+	// Listen for context cancellation to gracefully shut down
+	<-ctx.Done()
+	s.logger.Info("Shutting down HTTP server...")
+
+	// Create a deadline to wait for.
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := s.httpServer.Shutdown(shutdownCtx); err != nil {
+		s.logger.WithError(err).Fatal("HTTP server Shutdown failed")
+	}
+	s.logger.Info("HTTP server gracefully stopped")
+	return nil
 }
 
 // StartStdio starts the Todoist MCP server over stdio

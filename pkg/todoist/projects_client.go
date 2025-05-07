@@ -1,16 +1,17 @@
 package todoist
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
 // GetProjects retrieves all projects
-func (c *Client) GetProjects() ([]Project, error) {
+func (c *Client) GetProjects(ctx context.Context) ([]Project, error) {
 	endpoint := "/projects"
 
-	resp, err := c.doRequest("GET", endpoint, nil)
+	resp, err := c.doRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get projects: %w", err)
 	}
@@ -30,10 +31,10 @@ func (c *Client) GetProjects() ([]Project, error) {
 }
 
 // GetProject retrieves a specific project by ID
-func (c *Client) GetProject(id string) (*Project, error) {
+func (c *Client) GetProject(ctx context.Context, id string) (*Project, error) {
 	endpoint := fmt.Sprintf("/projects/%s", id)
 
-	resp, err := c.doRequest("GET", endpoint, nil)
+	resp, err := c.doRequest(ctx, "GET", endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project: %w", err)
 	}
