@@ -105,7 +105,7 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 	)
 
 	// Mark as read-only
-	tool.Annotations.ReadOnlyHint = true
+	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
 
 	return tool
 }
@@ -171,7 +171,7 @@ func (tp *ToolProvider) GetTask() mcp.Tool {
 	)
 
 	// Mark as read-only
-	tool.Annotations.ReadOnlyHint = true
+	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
 
 	return tool
 }
