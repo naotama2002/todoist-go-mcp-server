@@ -17,7 +17,7 @@ func TestGetProjectsTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_get_projects", tool.Name)
 	assert.Equal(t, "Get a list of projects.", tool.Description)
-	assert.True(t, tool.Annotations.ReadOnlyHint)
+	assert.True(t, *tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
 	var schema map[string]interface{}
@@ -49,7 +49,7 @@ func TestGetProjectTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_get_project", tool.Name)
 	assert.Equal(t, "Get a project by ID.", tool.Description)
-	assert.True(t, tool.Annotations.ReadOnlyHint)
+	assert.True(t, *tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
 	var schema map[string]interface{}
