@@ -1,16 +1,18 @@
 package todoist
 
+import "context"
+
 // TodoistClient defines the interface for Todoist API operations
 type TodoistClient interface {
-	GetTasks(projectID, filter string) ([]Task, error)
-	GetTask(id string) (*Task, error)
-	GetProjects() ([]Project, error)
-	GetProject(id string) (*Project, error)
-	CreateTask(req CreateTaskRequest) (*Task, error)
-	UpdateTask(id string, req UpdateTaskRequest) (*Task, error)
-	CloseTask(id string) error
-	ReopenTask(id string) error
-	DeleteTask(id string) error
+	GetTasks(ctx context.Context, projectID, filter string) ([]Task, error)
+	GetTask(ctx context.Context, id string) (*Task, error)
+	GetProjects(ctx context.Context) ([]Project, error)
+	GetProject(ctx context.Context, id string) (*Project, error)
+	CreateTask(ctx context.Context, req CreateTaskRequest) (*Task, error)
+	UpdateTask(ctx context.Context, id string, req UpdateTaskRequest) (*Task, error)
+	CloseTask(ctx context.Context, id string) error
+	ReopenTask(ctx context.Context, id string) error
+	DeleteTask(ctx context.Context, id string) error
 }
 
 // Task represents a Todoist task

@@ -57,7 +57,7 @@ func (tp *ToolProvider) HandleGetProjects(ctx context.Context, request mcp.CallT
 	tp.logger.Info("Getting projects")
 
 	// Call the Todoist API
-	projects, err := tp.client.GetProjects()
+	projects, err := tp.client.GetProjects(ctx)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get projects")
 		return mcp.NewToolResultErrorFromErr("Failed to get projects", err), nil
@@ -122,7 +122,7 @@ func (tp *ToolProvider) HandleGetProject(ctx context.Context, request mcp.CallTo
 	tp.logger.WithField("id", id).Info("Getting project")
 
 	// Call the Todoist API
-	project, err := tp.client.GetProject(id)
+	project, err := tp.client.GetProject(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get project")
 		return mcp.NewToolResultErrorFromErr("Failed to get project", err), nil

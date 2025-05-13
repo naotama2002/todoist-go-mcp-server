@@ -1,6 +1,7 @@
 package todoist
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -71,7 +72,7 @@ func TestGetTasks(t *testing.T) {
 			})
 
 			// Call the method
-			tasks, err := client.GetTasks(tt.projectID, tt.filter)
+			tasks, err := client.GetTasks(context.Background(), tt.projectID, tt.filter)
 
 			// Check error
 			if tt.wantErr {
@@ -129,7 +130,7 @@ func TestGetTask(t *testing.T) {
 			})
 
 			// Call the method
-			task, err := client.GetTask(tt.id)
+			task, err := client.GetTask(context.Background(), tt.id)
 
 			// Check error
 			if tt.wantErr {
@@ -191,7 +192,7 @@ func TestCreateTask(t *testing.T) {
 			})
 
 			// Call the method
-			task, err := client.CreateTask(tt.req)
+			task, err := client.CreateTask(context.Background(), tt.req)
 
 			// Check error
 			if tt.wantErr {
@@ -255,7 +256,7 @@ func TestUpdateTask(t *testing.T) {
 			})
 
 			// Call the method
-			task, err := client.UpdateTask(tt.id, tt.req)
+			task, err := client.UpdateTask(context.Background(), tt.id, tt.req)
 
 			// Check error
 			if tt.wantErr {
@@ -303,7 +304,7 @@ func TestCloseTask(t *testing.T) {
 			})
 
 			// Call the method
-			err := client.CloseTask(tt.id)
+			err := client.CloseTask(context.Background(), tt.id)
 
 			// Check error
 			if tt.wantErr {
@@ -347,7 +348,7 @@ func TestDeleteTask(t *testing.T) {
 			})
 
 			// Call the method
-			err := client.DeleteTask(tt.id)
+			err := client.DeleteTask(context.Background(), tt.id)
 
 			// Check error
 			if tt.wantErr {
@@ -400,7 +401,7 @@ func TestGetProjects(t *testing.T) {
 			})
 
 			// Call the method
-			projects, err := client.GetProjects()
+			projects, err := client.GetProjects(context.Background())
 
 			// Check error
 			if tt.wantErr {
@@ -458,7 +459,7 @@ func TestGetProject(t *testing.T) {
 			})
 
 			// Call the method
-			project, err := client.GetProject(tt.id)
+			project, err := client.GetProject(context.Background(), tt.id)
 
 			// Check error
 			if tt.wantErr {
