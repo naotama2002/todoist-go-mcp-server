@@ -85,7 +85,7 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 			},
 			"filter": map[string]interface{}{
 				"type":        "string",
-				"description": "Todoist filter query using the Todoist filter syntax. Examples: 'today', 'tomorrow', 'next week', 'overdue', 'priority 1', 'search: meeting', 'date: 2023-12-31', 'no date'. See https://todoist.com/help/articles/introduction-to-filters for more examples.",
+				"description": "Todoist filter query using the Todoist filter syntax. Examples: 'today', 'tomorrow', 'next week', 'overdue', 'priority 1', 'search: meeting', 'date: 2023-12-31', 'no date'. See https://www.todoist.com/help/articles/introduction-to-filters-V98wIH for more examples.",
 			},
 		},
 	}
