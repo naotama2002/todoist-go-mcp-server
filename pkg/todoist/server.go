@@ -63,6 +63,7 @@ func createDefaultToolsetGroup(tp *ToolProvider, readOnly bool) *toolsets.Toolse
 	// Create task management toolset
 	taskToolset := toolsets.NewToolset("tasks", "Todoist task management tools")
 	taskToolset.AddReadTools(
+		toolsets.NewServerTool(tp.GetTaskFilterRules(), tp.HandleGetTaskFilterRules),
 		toolsets.NewServerTool(tp.GetTasks(), tp.HandleGetTasks),
 		toolsets.NewServerTool(tp.GetTask(), tp.HandleGetTask),
 	)

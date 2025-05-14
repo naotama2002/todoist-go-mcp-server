@@ -171,6 +171,8 @@ func (m *MockToolProviderWithHandlers) HandleToolCall(ctx context.Context, toolN
 		content = `{"projects":[{"id":"987654321","name":"Test Project"}]}`
 	case "todoist_get_project":
 		content = `{"id":"987654321","name":"Test Project"}`
+	case "todoist_get_task_filter_rules":
+		content = `{"basicFilters":{"today":"Tasks due today"},"logicalOperators":{"&":"AND operator"},"examples":{"this_week":{"naturalLanguage":"What are my tasks for this week?","filterSyntax":"7 days","description":"Shows tasks due in the next 7 days"}}}`
 	case "mock_tool":
 		// For the MockCallToolRequest test
 		contentBytes, _ := json.Marshal(params)

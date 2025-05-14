@@ -28,7 +28,7 @@ func TestGetTools(t *testing.T) {
 
 	// Check that the tools were returned correctly
 	assert.NotNil(t, tools)
-	assert.Len(t, tools, 8) // 8 tools: get_tasks, get_task, create_task, update_task, close_task, delete_task, get_projects, get_project
+	assert.Len(t, tools, 9) // 9 tools: get_tasks, get_task, create_task, update_task, close_task, delete_task, get_projects, get_project, get_task_filter_rules
 
 	// Check that the tools have the correct names
 	toolNames := make([]string, len(tools))
@@ -43,6 +43,7 @@ func TestGetTools(t *testing.T) {
 	assert.Contains(t, toolNames, "todoist_delete_task")
 	assert.Contains(t, toolNames, "todoist_get_projects")
 	assert.Contains(t, toolNames, "todoist_get_project")
+	assert.Contains(t, toolNames, "todoist_get_task_filter_rules")
 }
 
 func TestHandleMessage(t *testing.T) {
