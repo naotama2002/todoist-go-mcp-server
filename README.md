@@ -9,6 +9,7 @@ The Todoist MCP Server allows AI assistants to interact with Todoist, enabling t
 ## Features
 
 - **Task Management**
+  - Get filter rules and examples for task filtering
   - Get tasks with filtering options
   - Get task details
   - Create new tasks
@@ -116,6 +117,62 @@ go run cmd/test-mcp-client/main.go
 ## Available Tools
 
 ### Task Management
+
+#### `todoist_get_task_filter_rules`
+
+Get filter rules and examples for Todoist task filters. This tool helps translate natural language queries into Todoist filter syntax for the `todoist_get_tasks` tool.
+
+Parameters: None
+
+Example response (Markdown format):
+```markdown
+# Introduction to Filters
+
+Filters in Todoist are custom views that display tasks based on specific criteria. You can filter tasks by name, date, project, label, priority, creation date, and more.
+
+## Creating Filters
+
+1. Select "Filters & Labels" in the sidebar
+2. Click the add icon next to Filters
+3. Enter a name for your filter and change its color (optional)
+4. Enter your filter query
+5. Click "Add" to save your filter
+
+## Filter Symbols
+
+| Symbol | Meaning | Example |
+|--------|---------|--------|
+| \| | OR | today \| overdue |
+| & | AND | today & p1 |
+| ! | NOT | !subtask |
+| () | Priority processing | (today \| overdue) & #work |
+
+## Advanced Queries
+
+### Keyword-Based Filters
+
+| Description | Query |
+|-------------|-------|
+| Tasks containing "meeting" | search: meeting |
+| Tasks containing "meeting" scheduled for today | search: meeting & today |
+
+### Date-Based Filters
+
+| Description | Query |
+|-------------|-------|
+| Tasks for a specific date | date: jan 3 |
+| Tasks before a specific date | before: may 5 |
+| Tasks with no date | no date |
+
+## Useful Filter Examples
+
+| Description | Query |
+|-------------|-------|
+| Overdue or today's tasks in "Work" project | (today \| overdue) & #work |
+| Tasks with no date | no date |
+| Tasks with @waiting label in the next 7 days | 7 days & @waiting |
+```
+```
 
 #### `todoist_get_tasks`
 
@@ -310,6 +367,10 @@ todoist-mcp-server --mode http --addr :8080
   "description": "Manage Todoist tasks and projects",
   "endpoint": "http://localhost:8080",
   "tools": [
+    {
+      "name": "todoist_get_task_filter_rules",
+      "description": "Get filter rules and examples for Todoist task filters"
+    },
     {
       "name": "todoist_get_tasks",
       "description": "Get a list of tasks with filtering options"

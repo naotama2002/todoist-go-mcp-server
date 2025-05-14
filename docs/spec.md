@@ -20,7 +20,54 @@ if token == "" {
 
 ### タスク管理
 
-#### 1. `todoist_get_tasks`
+#### 1. `todoist_get_task_filter_rules`
+
+Todoistタスクフィルターのルールと例を取得します。このツールは、自然言語クエリをTodoistフィルター構文に変換するために使用されます。
+
+**パラメータ:**
+なし
+
+**戻り値:**
+Markdown形式のテキストで、以下の情報を含みます：
+
+```
+# Introduction to Filters
+
+Filters in Todoist are custom views that display tasks based on specific criteria. You can filter tasks by name, date, project, label, priority, creation date, and more.
+
+## Filter Symbols
+
+| Symbol | Meaning | Example |
+|--------|---------|--------|
+| \| | OR | today \| overdue |
+| & | AND | today & p1 |
+| ! | NOT | !subtask |
+| () | Priority processing | (today \| overdue) & #work |
+| , | Display in separate lists | date: yesterday, today |
+| \\ | Use special characters as regular characters | #1 \\& 2 |
+
+## Advanced Queries
+
+### Keyword-Based Filters
+| Description | Query |
+|-------------|-------|
+| Tasks containing "meeting" | search: meeting |
+| Tasks containing "meeting" scheduled for today | search: meeting & today |
+
+...
+
+## Useful Filter Examples
+
+| Description | Query |
+|-------------|-------|
+| Overdue or today's tasks in "Work" project | (today \| overdue) & #work |
+| Tasks with no date | no date |
+```
+
+完全なフィルター構文リファレンスには、基本フィルター、論理演算子、日付フィルター、優先度フィルター、プロジェクトとラベルのフィルター、検索フィルター、その他の便利なフィルター例が含まれます。
+```
+
+#### 2. `todoist_get_tasks`
 
 タスクの一覧を取得します。
 

@@ -64,6 +64,10 @@ func (tp *ToolProvider) GetTools() []server.ServerTool {
 			Tool:    tp.GetProject(),
 			Handler: tp.HandleGetProject,
 		},
+		{
+			Tool:    tp.GetTaskFilterRules(),
+			Handler: tp.HandleGetTaskFilterRules,
+		},
 		// Add other tools here
 	}
 }
