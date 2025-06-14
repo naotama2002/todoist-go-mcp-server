@@ -26,13 +26,7 @@ func NewMockToolProvider() *ToolProvider {
 // MockCallToolRequest creates a mock CallToolRequest for testing
 func MockCallToolRequest(params map[string]interface{}) mcp.CallToolRequest {
 	return mcp.CallToolRequest{
-		Params: struct {
-			Name      string                 `json:"name"`
-			Arguments map[string]interface{} `json:"arguments,omitempty"`
-			Meta      *struct {
-				ProgressToken mcp.ProgressToken `json:"progressToken,omitempty"`
-			} `json:"_meta,omitempty"`
-		}{
+		Params: mcp.CallToolParams{
 			Name:      "mock_tool",
 			Arguments: params,
 		},
