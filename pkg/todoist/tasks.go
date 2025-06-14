@@ -559,18 +559,19 @@ func (tp *ToolProvider) HandleDeleteTask(ctx context.Context, request mcp.CallTo
 // 2. If it is present, it checks if the parameter is of the expected type and returns it
 func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 	var zero T
+	args := r.GetArguments()
 
 	// Check if the parameter is present in the request
-	if _, ok := r.Params.Arguments[p]; !ok {
+	if _, ok := args[p]; !ok {
 		return zero, nil
 	}
 
 	// Check if the parameter is of the expected type
-	if _, ok := r.Params.Arguments[p].(T); !ok {
+	if _, ok := args[p].(T); !ok {
 		return zero, fmt.Errorf("parameter %s is not of the expected type", p)
 	}
 
-	return r.Params.Arguments[p].(T), nil
+	return args[p].(T), nil
 }
 
 // OptionalStringArrayParam is a helper function that can be used to fetch a requested parameter from the request.
@@ -579,12 +580,13 @@ func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 // 2. If it is present, it checks if the parameter is an array
 // 3. If it is an array, it checks each element is a string
 func OptionalStringArrayParam(r mcp.CallToolRequest, p string) ([]string, error) {
+	args := r.GetArguments()
 	// Check if the parameter is present in the request
-	if _, ok := r.Params.Arguments[p]; !ok {
+	if _, ok := args[p]; !ok {
 		return []string{}, nil
 	}
 
-	switch v := r.Params.Arguments[p].(type) {
+	switch v := args[p].(type) {
 	case nil:
 		return []string{}, nil
 	case []string:
@@ -608,16 +610,17 @@ func OptionalStringArrayParam(r mcp.CallToolRequest, p string) ([]string, error)
 // It returns an error if the parameter is not present or not of the expected type.
 func RequiredParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 	var zero T
+	args := r.GetArguments()
 
 	// Check if the parameter is present in the request
-	if _, ok := r.Params.Arguments[p]; !ok {
+	if _, ok := args[p]; !ok {
 		return zero, fmt.Errorf("parameter %s is required", p)
 	}
 
 	// Check if the parameter is of the expected type
-	if _, ok := r.Params.Arguments[p].(T); !ok {
+	if _, ok := args[p].(T); !ok {
 		return zero, fmt.Errorf("parameter %s is not of the expected type", p)
 	}
 
-	return r.Params.Arguments[p].(T), nil
+	return args[p].(T), nil
 }
