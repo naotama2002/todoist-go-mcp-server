@@ -25,10 +25,11 @@ The Todoist MCP Server allows AI assistants to interact with Todoist, enabling t
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.21 or later (for building from source)
+- Docker (for Docker installation)
 - Todoist API token
 
-### Setup
+### Building from Source
 
 1. Clone the repository:
 
@@ -43,7 +44,36 @@ cd todoist-go-mcp-server
 go mod download
 ```
 
-3. Set up your Todoist API token:
+3. Build the binary:
+
+```bash
+make build
+```
+
+### Using Docker
+
+You can also run `todoist-mcp-server` using Docker, which provides a consistent environment and easier deployment.
+
+#### Pull from GitHub Container Registry
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/naotama2002/todoist-go-mcp-server:latest
+
+# Or pull a specific version
+docker pull ghcr.io/naotama2002/todoist-go-mcp-server:{TAG}
+```
+
+#### Build locally
+
+```bash
+# Build the Docker image
+docker build -t todoist-mcp-server .
+```
+
+### Setup
+
+Set up your Todoist API token:
 
 Create a `.envrc` file in the root directory with the following content:
 
@@ -67,7 +97,9 @@ export TODOIST_API_TOKEN=your_todoist_api_token
 
 ### Running the Server
 
-#### HTTP Mode
+#### Binary Usage
+
+##### HTTP Mode
 
 Run the server in HTTP mode:
 
@@ -75,12 +107,54 @@ Run the server in HTTP mode:
 go run cmd/todoist-mcp-server/main.go --mode http --addr :8080
 ```
 
-#### Standard I/O Mode
+Or using the built binary:
+
+```bash
+./build/todoist-mcp-server --mode http --addr :8080
+```
+
+##### Standard I/O Mode
 
 Run the server in stdio mode for integration with MCP clients:
 
 ```bash
 go run cmd/todoist-mcp-server/main.go --mode stdio
+```
+
+Or using the built binary:
+
+```bash
+./build/todoist-mcp-server --mode stdio
+```
+
+#### Docker Usage
+
+##### HTTP Mode
+
+```bash
+# Basic usage with Docker
+docker run --rm -it -p 8080:8080 -e TODOIST_API_TOKEN=your_todoist_api_token \
+  ghcr.io/naotama2002/todoist-go-mcp-server:latest --mode http --addr :8080
+
+# With custom port
+docker run --rm -it -p 3000:3000 -e TODOIST_API_TOKEN=your_todoist_api_token \
+  ghcr.io/naotama2002/todoist-go-mcp-server:latest --mode http --addr :3000
+
+# Using locally built image
+docker run --rm -it -p 8080:8080 -e TODOIST_API_TOKEN=your_todoist_api_token \
+  todoist-mcp-server --mode http --addr :8080
+```
+
+##### Standard I/O Mode
+
+```bash
+# For stdio mode (used with MCP clients)
+docker run --rm -i -e TODOIST_API_TOKEN=your_todoist_api_token \
+  ghcr.io/naotama2002/todoist-go-mcp-server:latest --mode stdio
+
+# Using locally built image
+docker run --rm -i -e TODOIST_API_TOKEN=your_todoist_api_token \
+  todoist-mcp-server --mode stdio
 ```
 
 ### Command Line Options
@@ -409,12 +483,29 @@ todoist-mcp-server --mode http --addr :8080
 
 #### Stdio Mode
 
+##### Using Binary
+
 Claude Desktop / Cline, Roo Cline / Windsurf
 
 ```json
 {
   "mcpServers": {
-    "github": {
+    "todoist": {
+      "command": "/path/to/todoist-mcp-server",
+      "args": ["--mode", "stdio"],
+      "env": {
+        "TODOIST_API_TOKEN": "<YOUR_TODOIST_API_TOKEN>"
+      }
+    }
+  }
+}
+```
+
+VSCode
+```json
+{
+  "mcp": {
+    "servers": {
       "todoist": {
         "command": "/path/to/todoist-mcp-server",
         "args": ["--mode", "stdio"],
@@ -427,17 +518,47 @@ Claude Desktop / Cline, Roo Cline / Windsurf
 }
 ```
 
-VSCode
+##### Using Docker
+
+Claude Desktop / Cline, Roo Cline / Windsurf
+
+```json
+{
+  "mcpServers": {
+    "todoist": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "TODOIST_API_TOKEN=<YOUR_TODOIST_API_TOKEN>",
+        "ghcr.io/naotama2002/todoist-go-mcp-server:latest",
+        "--mode",
+        "stdio"
+      ]
+    }
+  }
+}
 ```
+
+VSCode
+```json
 {
   "mcp": {
     "servers": {
       "todoist": {
-        "command": "/path/to/todoist-mcp-server",
-        "args": ["--mode", "stdio"],
-        "env": {
-          "TODOIST_API_TOKEN": "<YOUR_TODOIST_API_TOKEN>"
-        }
+        "command": "docker",
+        "args": [
+          "run",
+          "--rm",
+          "-i",
+          "-e",
+          "TODOIST_API_TOKEN=<YOUR_TODOIST_API_TOKEN>",
+          "ghcr.io/naotama2002/todoist-go-mcp-server:latest",
+          "--mode",
+          "stdio"
+        ]
       }
     }
   }
@@ -455,6 +576,48 @@ Now you can ask Claude to manage your Todoist tasks and projects using natural l
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Troubleshooting
+
+### Docker Issues
+
+#### Port Already in Use
+
+If you get a "port already in use" error, either stop the conflicting service or use a different port:
+
+```bash
+# Use a different port
+docker run --rm -it -p 3335:8080 -e TODOIST_API_TOKEN=your_todoist_api_token \
+  ghcr.io/naotama2002/todoist-go-mcp-server:latest --mode http --addr :8080
+```
+
+#### Network Issues with MCP Clients
+
+If MCP clients can't connect to the Docker container, try using host networking:
+
+```bash
+# Use host networking mode
+docker run --rm -i --net=host -e TODOIST_API_TOKEN=your_todoist_api_token \
+  ghcr.io/naotama2002/todoist-go-mcp-server:latest --mode stdio
+```
+
+#### Environment Variable Issues
+
+Make sure your Todoist API token is properly set:
+
+```bash
+# Check if the token is set correctly
+docker run --rm -i -e TODOIST_API_TOKEN=your_actual_token \
+  ghcr.io/naotama2002/todoist-go-mcp-server:latest --mode stdio
+```
+
+### Clear Authentication Data
+
+If you're having issues with authentication, check your Todoist API token:
+
+1. Go to [Todoist Integrations](https://todoist.com/prefs/integrations)
+2. Copy your API token
+3. Make sure it's properly set in your environment
 
 ## License
 
