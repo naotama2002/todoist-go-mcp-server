@@ -1,15 +1,24 @@
 package toolsets
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/mark3labs/mcp-go/server"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
+// ToolHandlerFunc is a handler function for a tool call.
+type ToolHandlerFunc func(context.Context, *mcp.CallToolRequest) (*mcp.CallToolResult, error)
+
+// ServerTool is a tool definition bound to a handler.
+type ServerTool struct {
+	Tool    mcp.Tool
+	Handler ToolHandlerFunc
+}
+
 // NewServerTool creates a new server tool
-func NewServerTool(tool mcp.Tool, handler server.ToolHandlerFunc) server.ServerTool {
-	return server.ServerTool{Tool: tool, Handler: handler}
+func NewServerTool(tool mcp.Tool, handler ToolHandlerFunc) ServerTool {
+	return ServerTool{Tool: tool, Handler: handler}
 }
 
 // Toolset represents a group of related tools
@@ -18,12 +27,12 @@ type Toolset struct {
 	Description string
 	Enabled     bool
 	readOnly    bool
-	writeTools  []server.ServerTool
-	readTools   []server.ServerTool
+	writeTools  []ServerTool
+	readTools   []ServerTool
 }
 
 // GetActiveTools returns all active tools in the toolset
-func (t *Toolset) GetActiveTools() []server.ServerTool {
+func (t *Toolset) GetActiveTools() []ServerTool {
 	if t.Enabled {
 		if t.readOnly {
 			return t.readTools
@@ -34,7 +43,7 @@ func (t *Toolset) GetActiveTools() []server.ServerTool {
 }
 
 // GetAvailableTools returns all available tools in the toolset
-func (t *Toolset) GetAvailableTools() []server.ServerTool {
+func (t *Toolset) GetAvailableTools() []ServerTool {
 	if t.readOnly {
 		return t.readTools
 	}
@@ -42,16 +51,16 @@ func (t *Toolset) GetAvailableTools() []server.ServerTool {
 }
 
 // RegisterTools registers all tools in the toolset with the MCP server
-func (t *Toolset) RegisterTools(s *server.MCPServer) {
+func (t *Toolset) RegisterTools(s *mcp.Server) {
 	if !t.Enabled {
 		return
 	}
 	for _, tool := range t.readTools {
-		s.AddTool(tool.Tool, tool.Handler)
+		s.AddTool(&tool.Tool, mcp.ToolHandler(tool.Handler))
 	}
 	if !t.readOnly {
 		for _, tool := range t.writeTools {
-			s.AddTool(tool.Tool, tool.Handler)
+			s.AddTool(&tool.Tool, mcp.ToolHandler(tool.Handler))
 		}
 	}
 }
@@ -62,9 +71,9 @@ func (t *Toolset) SetReadOnly() {
 }
 
 // AddWriteTools adds write tools to the toolset
-func (t *Toolset) AddWriteTools(tools ...server.ServerTool) *Toolset {
+func (t *Toolset) AddWriteTools(tools ...ServerTool) *Toolset {
 	for _, tool := range tools {
-		if tool.Tool.Annotations.ReadOnlyHint != nil && *tool.Tool.Annotations.ReadOnlyHint {
+		if tool.Tool.Annotations != nil && tool.Tool.Annotations.ReadOnlyHint {
 			panic(fmt.Sprintf("tool (%s) is incorrectly annotated as read-only", tool.Tool.Name))
 		}
 	}
@@ -75,13 +84,13 @@ func (t *Toolset) AddWriteTools(tools ...server.ServerTool) *Toolset {
 }
 
 // AddReadTools adds read-only tools to the toolset
-func (t *Toolset) AddReadTools(tools ...server.ServerTool) *Toolset {
+func (t *Toolset) AddReadTools(tools ...ServerTool) *Toolset {
 	for _, tool := range tools {
-		if tool.Tool.Annotations.ReadOnlyHint == nil || !*tool.Tool.Annotations.ReadOnlyHint {
+		if tool.Tool.Annotations == nil || !tool.Tool.Annotations.ReadOnlyHint {
 			panic(fmt.Sprintf("tool (%s) must be annotated as read-only", tool.Tool.Name))
 		}
-		tool.Tool.Annotations = mcp.ToolAnnotation{
-			ReadOnlyHint: mcp.ToBoolPtr(true),
+		tool.Tool.Annotations = &mcp.ToolAnnotations{
+			ReadOnlyHint: true,
 			Title:        tool.Tool.Annotations.Title,
 		}
 	}
@@ -173,7 +182,7 @@ func (tg *ToolsetGroup) EnableToolset(name string) error {
 }
 
 // RegisterTools registers all tools in the group with the MCP server
-func (tg *ToolsetGroup) RegisterTools(s *server.MCPServer) {
+func (tg *ToolsetGroup) RegisterTools(s *mcp.Server) {
 	for _, toolset := range tg.Toolsets {
 		toolset.RegisterTools(s)
 	}

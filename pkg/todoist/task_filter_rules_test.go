@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,11 +20,13 @@ func TestGetTaskFilterRulesTool(t *testing.T) {
 	// ツールのプロパティをチェック
 	assert.Equal(t, "todoist_get_task_filter_rules", tool.Name)
 	assert.Equal(t, "Get the filter rules and examples for Todoist task filters. Use this information to translate natural language queries into Todoist filter syntax for the todoist_get_tasks tool.", tool.Description)
-	assert.True(t, *tool.Annotations.ReadOnlyHint)
+	assert.True(t, tool.Annotations.ReadOnlyHint)
 
 	// 入力スキーマをチェック
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// スキーマタイプをチェック
@@ -62,8 +64,6 @@ func TestHandleGetTaskFilterRules(t *testing.T) {
 	var content string
 	switch c := result.Content[0].(type) {
 	case *mcp.TextContent:
-		content = c.Text
-	case mcp.TextContent:
 		content = c.Text
 	default:
 		// デバッグ情報を出力

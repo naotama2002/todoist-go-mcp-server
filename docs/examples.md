@@ -53,7 +53,6 @@ async function createTaskWithDueDate(content, dueString, priority = 4) {
     
     console.log(`Task created: ${result.task.content}`);
     console.log(`Due: ${result.task.due?.string}`);
-    console.log(`URL: ${result.task.url}`);
     
     return result.task;
   } catch (error) {
@@ -201,7 +200,6 @@ def create_task_with_due_date(content, due_string, priority=4):
         print(f"Task created: {task['content']}")
         if "due" in task and task["due"]:
             print(f"Due: {task['due'].get('string', '')}")
-        print(f"URL: {task['url']}")
         
         return task
     except Exception as e:
@@ -245,7 +243,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 func main() {
@@ -327,18 +325,16 @@ func createTask(client *mcp.Client, content, dueString string, priority int) {
 			Due     struct {
 				String string `json:"string"`
 			} `json:"due"`
-			URL string `json:"url"`
 		} `json:"task"`
 	}
-	
+
 	if err := json.Unmarshal([]byte(result.Text), &response); err != nil {
 		log.Fatalf("Error parsing response: %v", err)
 	}
-	
+
 	// Display the created task
 	fmt.Printf("Task created: %s\n", response.Task.Content)
 	fmt.Printf("Due: %s\n", response.Task.Due.String)
-	fmt.Printf("URL: %s\n", response.Task.URL)
 }
 ```
 

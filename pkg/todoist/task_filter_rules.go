@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 // GetTaskFilterRules はtodoist_get_task_filter_rulesツールを返します
@@ -22,21 +22,16 @@ func (tp *ToolProvider) GetTaskFilterRules() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// 読み取り専用のアノテーション付きでツールを作成
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_get_task_filter_rules",
-		"Get the filter rules and examples for Todoist task filters. Use this information to translate natural language queries into Todoist filter syntax for the todoist_get_tasks tool.",
-		inputSchemaJSON,
-	)
-
-	// 読み取り専用としてマーク
-	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_get_task_filter_rules",
+		Description: "Get the filter rules and examples for Todoist task filters. Use this information to translate natural language queries into Todoist filter syntax for the todoist_get_tasks tool.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
+	}
 }
 
 // HandleGetTaskFilterRules はtodoist_get_task_filter_rulesツールリクエストを処理します
-func (tp *ToolProvider) HandleGetTaskFilterRules(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleGetTaskFilterRules(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// リクエストをログに記録
 	tp.logger.Info("Getting task filter rules")
 
@@ -169,5 +164,5 @@ Use comma (,) to display multiple lists in the same view:
 
 Example: "p1 & overdue, p4 & today" - Shows priority 1 overdue tasks and priority 4 tasks due today`
 
-	return mcp.NewToolResultText(filterRulesText), nil
+	return newToolResultText(filterRulesText), nil
 }

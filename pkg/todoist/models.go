@@ -15,16 +15,38 @@ type TodoistClient interface {
 	DeleteTask(ctx context.Context, id string) error
 }
 
-// Task represents a Todoist task
+// PaginatedResponse is a generic paginated response from the Todoist API v1
+type PaginatedResponse[T any] struct {
+	Results    []T     `json:"results"`
+	NextCursor *string `json:"next_cursor"`
+}
+
+// Task represents a Todoist task (API v1)
 type Task struct {
-	ID          string `json:"id"`
-	Content     string `json:"content"`
-	Description string `json:"description"`
-	ProjectID   string `json:"project_id"`
-	ParentID    string `json:"parent_id,omitempty"`
-	Priority    int    `json:"priority"`
-	Due         *Due   `json:"due,omitempty"`
-	URL         string `json:"url"`
+	ID             string    `json:"id"`
+	UserID         string    `json:"user_id"`
+	Content        string    `json:"content"`
+	Description    string    `json:"description"`
+	ProjectID      string    `json:"project_id"`
+	SectionID      *string   `json:"section_id"`
+	ParentID       *string   `json:"parent_id"`
+	AddedByUID     *string   `json:"added_by_uid"`
+	AssignedByUID  *string   `json:"assigned_by_uid"`
+	ResponsibleUID *string   `json:"responsible_uid"`
+	Labels         []string  `json:"labels"`
+	Deadline       *Deadline `json:"deadline"`
+	Duration       *Duration `json:"duration"`
+	Checked        bool      `json:"checked"`
+	IsDeleted      bool      `json:"is_deleted"`
+	AddedAt        *string   `json:"added_at"`
+	CompletedAt    *string   `json:"completed_at"`
+	UpdatedAt      *string   `json:"updated_at"`
+	Due            *Due      `json:"due"`
+	Priority       int       `json:"priority"`
+	ChildOrder     int       `json:"child_order"`
+	NoteCount      int       `json:"note_count"`
+	DayOrder       int       `json:"day_order"`
+	IsCollapsed    bool      `json:"is_collapsed"`
 }
 
 // Due represents a due date for a task
@@ -34,22 +56,41 @@ type Due struct {
 	Datetime    string `json:"datetime,omitempty"`
 	String      string `json:"string,omitempty"`
 	Timezone    string `json:"timezone,omitempty"`
+	Lang        string `json:"lang,omitempty"`
 }
 
-// Project represents a Todoist project
+// Deadline represents a task deadline
+type Deadline struct {
+	Date string `json:"date"`
+	Lang string `json:"lang"`
+}
+
+// Duration represents a task duration
+type Duration struct {
+	Amount int    `json:"amount"`
+	Unit   string `json:"unit"`
+}
+
+// Project represents a Todoist project (API v1)
 type Project struct {
-	ID             string `json:"id"`
-	Name           string `json:"name"`
-	CommentCount   int    `json:"comment_count"`
-	Order          int    `json:"order"`
-	Color          string `json:"color"`
-	IsShared       bool   `json:"is_shared"`
-	IsFavorite     bool   `json:"is_favorite"`
-	IsInboxProject bool   `json:"is_inbox_project"`
-	IsTeamInbox    bool   `json:"is_team_inbox"`
-	ViewStyle      string `json:"view_style"`
-	URL            string `json:"url"`
-	ParentID       string `json:"parent_id,omitempty"`
+	ID             string  `json:"id"`
+	Name           string  `json:"name"`
+	CanAssignTasks bool    `json:"can_assign_tasks"`
+	ChildOrder     int     `json:"child_order"`
+	Color          string  `json:"color"`
+	CreatedAt      *string `json:"created_at"`
+	IsArchived     bool    `json:"is_archived"`
+	IsDeleted      bool    `json:"is_deleted"`
+	IsFavorite     bool    `json:"is_favorite"`
+	IsFrozen       bool    `json:"is_frozen"`
+	UpdatedAt      *string `json:"updated_at"`
+	ViewStyle      string  `json:"view_style"`
+	DefaultOrder   int     `json:"default_order"`
+	Description    string  `json:"description"`
+	IsCollapsed    bool    `json:"is_collapsed"`
+	IsShared       bool    `json:"is_shared"`
+	ParentID       *string `json:"parent_id"`
+	InboxProject   bool    `json:"inbox_project"`
 }
 
 // CreateTaskRequest represents the request to create a task

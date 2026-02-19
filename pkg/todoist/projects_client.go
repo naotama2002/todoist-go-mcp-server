@@ -21,13 +21,13 @@ func (c *Client) GetProjects(ctx context.Context) ([]Project, error) {
 		return nil, err
 	}
 
-	// Parse response
-	var projects []Project
-	if err := json.Unmarshal(bodyBytes, &projects); err != nil {
+	// Parse paginated response
+	var paginatedResp PaginatedResponse[Project]
+	if err := json.Unmarshal(bodyBytes, &paginatedResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	return projects, nil
+	return paginatedResp.Results, nil
 }
 
 // GetProject retrieves a specific project by ID

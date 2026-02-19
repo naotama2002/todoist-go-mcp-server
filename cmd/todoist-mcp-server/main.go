@@ -50,7 +50,7 @@ func main() {
 		// Start the server in stdio mode
 		logger.Info("Starting Todoist MCP server in stdio mode")
 		go func() {
-			errCh <- server.StartStdio(ctx, os.Stdin, os.Stdout)
+			errCh <- server.StartStdio(ctx)
 		}()
 	default:
 		logger.Fatalf("Invalid mode: %s. Must be 'http' or 'stdio'", *mode)

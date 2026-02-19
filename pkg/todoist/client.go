@@ -13,7 +13,7 @@ import (
 
 const (
 	// TodoistAPIBaseURL is the base URL for Todoist API
-	TodoistAPIBaseURL = "https://api.todoist.com/rest/v2"
+	TodoistAPIBaseURL = "https://api.todoist.com/api/v1"
 	// DefaultTimeout is the default timeout for HTTP requests
 	DefaultTimeout = 10 * time.Second
 )

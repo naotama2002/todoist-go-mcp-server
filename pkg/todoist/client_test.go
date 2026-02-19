@@ -18,7 +18,7 @@ func TestNewClient(t *testing.T) {
 	// Check that the client was created correctly
 	assert.NotNil(t, client)
 	assert.Equal(t, "valid_token", client.token)
-	assert.Equal(t, "https://api.todoist.com/rest/v2", client.baseURL)
+	assert.Equal(t, "https://api.todoist.com/api/v1", client.baseURL)
 	assert.NotNil(t, client.httpClient)
 	assert.Equal(t, logger, client.logger)
 }
@@ -59,6 +59,14 @@ func TestGetTasks(t *testing.T) {
 			mockErr:   errors.New("api error"),
 			wantErr:   true,
 		},
+		{
+			name:      "filter uses filter endpoint",
+			projectID: "",
+			filter:    "today",
+			mockTasks: []Task{mockTask},
+			mockErr:   nil,
+			wantErr:   false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -68,7 +76,9 @@ func TestGetTasks(t *testing.T) {
 				if tt.mockErr != nil {
 					return nil, tt.mockErr
 				}
-				return MockResponse(200, tt.mockTasks), nil
+				// Return paginated response
+				paginatedResp := MockPaginatedTasks(tt.mockTasks)
+				return MockResponse(200, paginatedResp), nil
 			})
 
 			// Call the method
@@ -87,6 +97,20 @@ func TestGetTasks(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetTasksFilterEndpoint(t *testing.T) {
+	// Verify that filter requests go to /tasks/filter with query param
+	client := NewMockClient(func(req *http.Request) (*http.Response, error) {
+		assert.Contains(t, req.URL.Path, "/tasks/filter")
+		assert.Equal(t, "today", req.URL.Query().Get("query"))
+		paginatedResp := MockPaginatedTasks([]Task{*MockTask()})
+		return MockResponse(200, paginatedResp), nil
+	})
+
+	tasks, err := client.GetTasks(context.Background(), "", "today")
+	assert.NoError(t, err)
+	assert.Len(t, tasks, 1)
 }
 
 func TestGetTask(t *testing.T) {
@@ -397,7 +421,9 @@ func TestGetProjects(t *testing.T) {
 				if tt.mockErr != nil {
 					return nil, tt.mockErr
 				}
-				return MockResponse(200, tt.mockProjects), nil
+				// Return paginated response
+				paginatedResp := MockPaginatedProjects(tt.mockProjects)
+				return MockResponse(200, paginatedResp), nil
 			})
 
 			// Call the method
