@@ -3,7 +3,7 @@ module github.com/naotama2002/todoist-go-mcp-server
 go 1.24.2
 
 require (
-	github.com/mark3labs/mcp-go v0.43.2
+	github.com/mark3labs/mcp-go v0.44.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 )
