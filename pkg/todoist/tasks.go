@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 // GetTasksParams represents the parameters for the todoist_get_tasks tool
@@ -97,21 +97,16 @@ func (tp *ToolProvider) GetTasks() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool with read-only annotation
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_get_tasks",
-		"Get a list of tasks.",
-		inputSchemaJSON,
-	)
-
-	// Mark as read-only
-	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_get_tasks",
+		Description: "Get a list of tasks.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
+	}
 }
 
 // HandleGetTasks handles the todoist_get_tasks tool request
-func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	projectID, _ := OptionalParam[string](request, "projectId")
 	filter, _ := OptionalParam[string](request, "filter")
@@ -126,7 +121,7 @@ func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallTool
 	tasks, err := tp.client.GetTasks(ctx, projectID, filter)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get tasks")
-		return mcp.NewToolResultErrorFromErr("Failed to get tasks", err), nil
+		return newToolResultError("Failed to get tasks", err), nil
 	}
 
 	// Convert tasks to JSON
@@ -135,11 +130,11 @@ func (tp *ToolProvider) HandleGetTasks(ctx context.Context, request mcp.CallTool
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Failed to marshal response", err), nil
+		return newToolResultError("Failed to marshal response", err), nil
 	}
 
 	// Return the response
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return newToolResultText(string(responseJSON)), nil
 }
 
 // GetTask returns the todoist_get_task tool
@@ -163,25 +158,20 @@ func (tp *ToolProvider) GetTask() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool with read-only annotation
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_get_task",
-		"Get a specific task by ID.",
-		inputSchemaJSON,
-	)
-
-	// Mark as read-only
-	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_get_task",
+		Description: "Get a specific task by ID.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
+	}
 }
 
 // HandleGetTask handles the todoist_get_task tool request
-func (tp *ToolProvider) HandleGetTask(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleGetTask(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	id, err := RequiredParam[string](request, "id")
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Missing required parameter: id", err), nil
+		return newToolResultError("Missing required parameter: id", err), nil
 	}
 
 	// Log the request
@@ -193,7 +183,7 @@ func (tp *ToolProvider) HandleGetTask(ctx context.Context, request mcp.CallToolR
 	task, err := tp.client.GetTask(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get task")
-		return mcp.NewToolResultErrorFromErr("Failed to get task", err), nil
+		return newToolResultError("Failed to get task", err), nil
 	}
 
 	// Convert task to JSON
@@ -202,11 +192,11 @@ func (tp *ToolProvider) HandleGetTask(ctx context.Context, request mcp.CallToolR
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Failed to marshal response", err), nil
+		return newToolResultError("Failed to marshal response", err), nil
 	}
 
 	// Return the response
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return newToolResultText(string(responseJSON)), nil
 }
 
 // CreateTask returns the todoist_create_task tool
@@ -218,7 +208,7 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 		"properties": map[string]interface{}{
 			"content": map[string]interface{}{
 				"type":        "string",
-				"description": "The content of the task (required). Supports text formatting using Markdown syntax. See https://todoist.com/help/articles/format-text-in-a-todoist-task for formatting options.",
+				"description": "The content of the task (required). Supports text formatting using Markdown syntax. See https://www.todoist.com/help/articles/format-text-in-a-todoist-task-e5dHw9 for formatting options.",
 			},
 			"description": map[string]interface{}{
 				"type":        "string",
@@ -264,22 +254,19 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_create_task",
-		"Create a new task.",
-		inputSchemaJSON,
-	)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_create_task",
+		Description: "Create a new task.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+	}
 }
 
 // HandleCreateTask handles the todoist_create_task tool request
-func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	content, err := RequiredParam[string](request, "content")
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Missing required parameter: content", err), nil
+		return newToolResultError("Missing required parameter: content", err), nil
 	}
 
 	description, _ := OptionalParam[string](request, "description")
@@ -317,7 +304,7 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 	task, err := tp.client.CreateTask(ctx, createReq)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to create task")
-		return mcp.NewToolResultErrorFromErr("Failed to create task", err), nil
+		return newToolResultError("Failed to create task", err), nil
 	}
 
 	// Convert task to JSON
@@ -326,11 +313,11 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request mcp.CallTo
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Failed to marshal response", err), nil
+		return newToolResultError("Failed to marshal response", err), nil
 	}
 
 	// Return the response
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return newToolResultText(string(responseJSON)), nil
 }
 
 // UpdateTask returns the todoist_update_task tool
@@ -346,7 +333,7 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 			},
 			"content": map[string]interface{}{
 				"type":        "string",
-				"description": "The new content of the task. Supports text formatting using Markdown syntax. See https://todoist.com/help/articles/format-text-in-a-todoist-task for formatting options.",
+				"description": "The new content of the task. Supports text formatting using Markdown syntax. See https://www.todoist.com/help/articles/format-text-in-a-todoist-task-e5dHw9 for formatting options.",
 			},
 			"description": map[string]interface{}{
 				"type":        "string",
@@ -380,22 +367,19 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_update_task",
-		"Update an existing task.",
-		inputSchemaJSON,
-	)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_update_task",
+		Description: "Update an existing task.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+	}
 }
 
 // HandleUpdateTask handles the todoist_update_task tool request
-func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	id, err := RequiredParam[string](request, "id")
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Missing required parameter: id", err), nil
+		return newToolResultError("Missing required parameter: id", err), nil
 	}
 
 	content, _ := OptionalParam[string](request, "content")
@@ -427,7 +411,7 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 	task, err := tp.client.UpdateTask(ctx, id, updateReq)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to update task")
-		return mcp.NewToolResultErrorFromErr("Failed to update task", err), nil
+		return newToolResultError("Failed to update task", err), nil
 	}
 
 	// Convert task to JSON
@@ -436,11 +420,11 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request mcp.CallTo
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Failed to marshal response", err), nil
+		return newToolResultError("Failed to marshal response", err), nil
 	}
 
 	// Return the response
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return newToolResultText(string(responseJSON)), nil
 }
 
 // CloseTask returns the todoist_close_task tool
@@ -464,22 +448,19 @@ func (tp *ToolProvider) CloseTask() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_close_task",
-		"Mark a task as completed.",
-		inputSchemaJSON,
-	)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_close_task",
+		Description: "Mark a task as completed.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+	}
 }
 
 // HandleCloseTask handles the todoist_close_task tool request
-func (tp *ToolProvider) HandleCloseTask(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleCloseTask(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	id, err := RequiredParam[string](request, "id")
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Missing required parameter: id", err), nil
+		return newToolResultError("Missing required parameter: id", err), nil
 	}
 
 	// Log the request
@@ -491,11 +472,11 @@ func (tp *ToolProvider) HandleCloseTask(ctx context.Context, request mcp.CallToo
 	err = tp.client.CloseTask(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to close task")
-		return mcp.NewToolResultErrorFromErr("Failed to close task", err), nil
+		return newToolResultError("Failed to close task", err), nil
 	}
 
 	// Return success response
-	return mcp.NewToolResultText(`{"success": true}`), nil
+	return newToolResultText(`{"success": true}`), nil
 }
 
 // DeleteTask returns the todoist_delete_task tool
@@ -519,22 +500,19 @@ func (tp *ToolProvider) DeleteTask() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_delete_task",
-		"Delete a task.",
-		inputSchemaJSON,
-	)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_delete_task",
+		Description: "Delete a task.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+	}
 }
 
 // HandleDeleteTask handles the todoist_delete_task tool request
-func (tp *ToolProvider) HandleDeleteTask(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleDeleteTask(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	id, err := RequiredParam[string](request, "id")
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Missing required parameter: id", err), nil
+		return newToolResultError("Missing required parameter: id", err), nil
 	}
 
 	// Log the request
@@ -546,20 +524,37 @@ func (tp *ToolProvider) HandleDeleteTask(ctx context.Context, request mcp.CallTo
 	err = tp.client.DeleteTask(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to delete task")
-		return mcp.NewToolResultErrorFromErr("Failed to delete task", err), nil
+		return newToolResultError("Failed to delete task", err), nil
 	}
 
 	// Return success response
-	return mcp.NewToolResultText(`{"success": true}`), nil
+	return newToolResultText(`{"success": true}`), nil
+}
+
+// getArguments extracts arguments from a CallToolRequest as a map
+func getArguments(r *mcp.CallToolRequest) (map[string]interface{}, error) {
+	var args map[string]interface{}
+	if r.Params != nil && r.Params.Arguments != nil {
+		if err := json.Unmarshal(r.Params.Arguments, &args); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal arguments: %w", err)
+		}
+	}
+	if args == nil {
+		args = make(map[string]interface{})
+	}
+	return args, nil
 }
 
 // OptionalParam is a helper function that can be used to fetch a requested parameter from the request.
 // It does the following checks:
 // 1. Checks if the parameter is present in the request, if not, it returns its zero-value
 // 2. If it is present, it checks if the parameter is of the expected type and returns it
-func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
+func OptionalParam[T any](r *mcp.CallToolRequest, p string) (T, error) {
 	var zero T
-	args := r.GetArguments()
+	args, err := getArguments(r)
+	if err != nil {
+		return zero, err
+	}
 
 	// Check if the parameter is present in the request
 	if _, ok := args[p]; !ok {
@@ -579,8 +574,11 @@ func OptionalParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 // 1. Checks if the parameter is present in the request, if not, it returns nil
 // 2. If it is present, it checks if the parameter is an array
 // 3. If it is an array, it checks each element is a string
-func OptionalStringArrayParam(r mcp.CallToolRequest, p string) ([]string, error) {
-	args := r.GetArguments()
+func OptionalStringArrayParam(r *mcp.CallToolRequest, p string) ([]string, error) {
+	args, err := getArguments(r)
+	if err != nil {
+		return nil, err
+	}
 	// Check if the parameter is present in the request
 	if _, ok := args[p]; !ok {
 		return []string{}, nil
@@ -608,9 +606,12 @@ func OptionalStringArrayParam(r mcp.CallToolRequest, p string) ([]string, error)
 
 // RequiredParam is a helper function that can be used to fetch a required parameter from the request.
 // It returns an error if the parameter is not present or not of the expected type.
-func RequiredParam[T any](r mcp.CallToolRequest, p string) (T, error) {
+func RequiredParam[T any](r *mcp.CallToolRequest, p string) (T, error) {
 	var zero T
-	args := r.GetArguments()
+	args, err := getArguments(r)
+	if err != nil {
+		return zero, err
+	}
 
 	// Check if the parameter is present in the request
 	if _, ok := args[p]; !ok {
@@ -623,4 +624,19 @@ func RequiredParam[T any](r mcp.CallToolRequest, p string) (T, error) {
 	}
 
 	return args[p].(T), nil
+}
+
+// newToolResultText creates a CallToolResult with text content
+func newToolResultText(text string) *mcp.CallToolResult {
+	return &mcp.CallToolResult{
+		Content: []mcp.Content{&mcp.TextContent{Text: text}},
+	}
+}
+
+// newToolResultError creates a CallToolResult with an error message
+func newToolResultError(msg string, err error) *mcp.CallToolResult {
+	return &mcp.CallToolResult{
+		Content: []mcp.Content{&mcp.TextContent{Text: fmt.Sprintf("%s: %s", msg, err.Error())}},
+		IsError: true,
+	}
 }

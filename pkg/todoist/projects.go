@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 // GetProjectsResponse represents the response from the todoist_get_projects tool
@@ -38,21 +38,16 @@ func (tp *ToolProvider) GetProjects() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool with read-only annotation
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_get_projects",
-		"Get a list of projects.",
-		inputSchemaJSON,
-	)
-
-	// Mark as read-only
-	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_get_projects",
+		Description: "Get a list of projects.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
+	}
 }
 
 // HandleGetProjects handles the todoist_get_projects tool request
-func (tp *ToolProvider) HandleGetProjects(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleGetProjects(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Log the request
 	tp.logger.Info("Getting projects")
 
@@ -60,7 +55,7 @@ func (tp *ToolProvider) HandleGetProjects(ctx context.Context, request mcp.CallT
 	projects, err := tp.client.GetProjects(ctx)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get projects")
-		return mcp.NewToolResultErrorFromErr("Failed to get projects", err), nil
+		return newToolResultError("Failed to get projects", err), nil
 	}
 
 	// Convert projects to JSON
@@ -69,11 +64,11 @@ func (tp *ToolProvider) HandleGetProjects(ctx context.Context, request mcp.CallT
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Failed to marshal response", err), nil
+		return newToolResultError("Failed to marshal response", err), nil
 	}
 
 	// Return the response
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return newToolResultText(string(responseJSON)), nil
 }
 
 // GetProject returns the todoist_get_project tool
@@ -97,25 +92,20 @@ func (tp *ToolProvider) GetProject() mcp.Tool {
 		return mcp.Tool{}
 	}
 
-	// Create the tool with read-only annotation
-	tool := mcp.NewToolWithRawSchema(
-		"todoist_get_project",
-		"Get a project by ID.",
-		inputSchemaJSON,
-	)
-
-	// Mark as read-only
-	tool.Annotations.ReadOnlyHint = mcp.ToBoolPtr(true)
-
-	return tool
+	return mcp.Tool{
+		Name:        "todoist_get_project",
+		Description: "Get a project by ID.",
+		InputSchema: json.RawMessage(inputSchemaJSON),
+		Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
+	}
 }
 
 // HandleGetProject handles the todoist_get_project tool request
-func (tp *ToolProvider) HandleGetProject(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (tp *ToolProvider) HandleGetProject(ctx context.Context, request *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	// Parse parameters
 	id, err := RequiredParam[string](request, "id")
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr(fmt.Sprintf("Invalid parameter: %s", err.Error()), err), nil
+		return newToolResultError(fmt.Sprintf("Invalid parameter: %s", err.Error()), err), nil
 	}
 
 	// Log the request
@@ -125,7 +115,7 @@ func (tp *ToolProvider) HandleGetProject(ctx context.Context, request mcp.CallTo
 	project, err := tp.client.GetProject(ctx, id)
 	if err != nil {
 		tp.logger.WithError(err).Error("Failed to get project")
-		return mcp.NewToolResultErrorFromErr("Failed to get project", err), nil
+		return newToolResultError("Failed to get project", err), nil
 	}
 
 	// Convert project to JSON
@@ -134,9 +124,9 @@ func (tp *ToolProvider) HandleGetProject(ctx context.Context, request mcp.CallTo
 	}
 	responseJSON, err := json.Marshal(response)
 	if err != nil {
-		return mcp.NewToolResultErrorFromErr("Failed to marshal response", err), nil
+		return newToolResultError("Failed to marshal response", err), nil
 	}
 
 	// Return the response
-	return mcp.NewToolResultText(string(responseJSON)), nil
+	return newToolResultText(string(responseJSON)), nil
 }

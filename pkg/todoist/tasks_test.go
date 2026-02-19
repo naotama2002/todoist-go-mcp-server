@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,11 +24,12 @@ func NewMockToolProvider() *ToolProvider {
 }
 
 // MockCallToolRequest creates a mock CallToolRequest for testing
-func MockCallToolRequest(params map[string]interface{}) mcp.CallToolRequest {
-	return mcp.CallToolRequest{
-		Params: mcp.CallToolParams{
+func MockCallToolRequest(params map[string]interface{}) *mcp.CallToolRequest {
+	argsJSON, _ := json.Marshal(params)
+	return &mcp.CallToolRequest{
+		Params: &mcp.CallToolParamsRaw{
 			Name:      "mock_tool",
-			Arguments: params,
+			Arguments: json.RawMessage(argsJSON),
 		},
 	}
 }
@@ -43,11 +44,14 @@ func TestGetTasksTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_get_tasks", tool.Name)
 	assert.Equal(t, "Get a list of tasks.", tool.Description)
-	assert.True(t, *tool.Annotations.ReadOnlyHint)
+	assert.True(t, tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type
@@ -167,11 +171,14 @@ func TestGetTaskTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_get_task", tool.Name)
 	assert.Equal(t, "Get a specific task by ID.", tool.Description)
-	assert.True(t, *tool.Annotations.ReadOnlyHint)
+	assert.True(t, tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type and required fields
@@ -288,8 +295,11 @@ func TestCreateTaskTool(t *testing.T) {
 	assert.Equal(t, "Create a new task.", tool.Description)
 
 	// Check input schema
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type and required fields
@@ -430,8 +440,11 @@ func TestUpdateTaskTool(t *testing.T) {
 	assert.Equal(t, "Update an existing task.", tool.Description)
 
 	// Check input schema
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type and required fields
@@ -570,11 +583,13 @@ func TestCloseTaskTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_close_task", tool.Name)
 	assert.Equal(t, "Mark a task as completed.", tool.Description)
-	// assert.False(t, *tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type and required fields
@@ -690,8 +705,11 @@ func TestDeleteTaskTool(t *testing.T) {
 	assert.Equal(t, "Delete a task.", tool.Description)
 
 	// Check input schema
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type and required fields
