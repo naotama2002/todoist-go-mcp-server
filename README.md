@@ -625,7 +625,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [Todoist API](https://developer.todoist.com/rest/v2/)
+- [Todoist API](https://developer.todoist.com/api/v1/)
 - [Model Context Protocol](https://github.com/mcp-sh/mcp)
 
 ## Development
