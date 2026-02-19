@@ -112,8 +112,8 @@ Creates a new task.
 - `description` (string, optional): Detailed description or notes for the task
 - `projectId` (string, optional): Project ID to assign the task to
 - `parentId` (string, optional): Parent task ID for creating subtasks
-- `child_order` (integer, optional): Order value for positioning the task
-- `priority` (integer, optional): Task priority: 4 (normal), 3 (medium), 2 (high), 1 (urgent)
+- `order` (integer, optional): Order value for positioning the task
+- `priority` (integer, optional): Task priority: 1 (normal), 2 (medium), 3 (high), 4 (urgent)
 - `dueString` (string, optional): Due date in natural language, e.g., 'today', 'tomorrow'
 - `dueDate` (string, optional): Due date in YYYY-MM-DD format
 - `dueDatetime` (string, optional): Due date and time in RFC3339 format
@@ -160,7 +160,7 @@ Updates an existing task.
 - `id` (string, required): The unique identifier of the task to update
 - `content` (string, optional): The new content of the task
 - `description` (string, optional): Detailed description or notes for the task
-- `priority` (integer, optional): Task priority: 4 (normal), 3 (medium), 2 (high), 1 (urgent)
+- `priority` (integer, optional): Task priority: 1 (normal), 2 (medium), 3 (high), 4 (urgent)
 - `dueString` (string, optional): Due date in natural language
 - `dueDate` (string, optional): Due date in YYYY-MM-DD format
 - `dueDatetime` (string, optional): Due date and time in RFC3339 format

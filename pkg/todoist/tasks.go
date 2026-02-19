@@ -228,7 +228,7 @@ func (tp *ToolProvider) CreateTask() mcp.Tool {
 			},
 			"priority": map[string]interface{}{
 				"type":        "integer",
-				"description": "Task priority: 4 (normal, default), 3 (medium), 2 (high), 1 (urgent). Note that 1 is the highest priority, 4 is the lowest.",
+				"description": "Task priority: 1 (normal, default), 2 (medium), 3 (high), 4 (urgent). Note that 4 is the highest priority, 1 is the lowest.",
 				"minimum":     1,
 				"maximum":     4,
 			},
@@ -341,7 +341,7 @@ func (tp *ToolProvider) UpdateTask() mcp.Tool {
 			},
 			"priority": map[string]interface{}{
 				"type":        "integer",
-				"description": "Task priority: 4 (normal, default), 3 (medium), 2 (high), 1 (urgent). Note that 1 is the highest priority, 4 is the lowest.",
+				"description": "Task priority: 1 (normal, default), 2 (medium), 3 (high), 4 (urgent). Note that 4 is the highest priority, 1 is the lowest.",
 				"minimum":     1,
 				"maximum":     4,
 			},
