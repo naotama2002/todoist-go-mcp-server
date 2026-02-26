@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 // MockHTTPClient is a mock HTTP client for testing
@@ -65,14 +65,15 @@ func NewMockClient(doFunc func(req *http.Request) (*http.Response, error)) *Clie
 	return client
 }
 
-// MockTask returns a mock Task for testing
+// MockTask returns a mock Task for testing (API v1 format)
 func MockTask() *Task {
+	parentID := "456456456"
 	return &Task{
 		ID:          "123456789",
 		Content:     "Test Task",
 		Description: "This is a test task",
 		ProjectID:   "987654321",
-		ParentID:    "456456456",
+		ParentID:    &parentID,
 		Priority:    4,
 		Due: &Due{
 			Date:        "2023-12-31",
@@ -81,25 +82,36 @@ func MockTask() *Task {
 			String:      "Dec 31",
 			Timezone:    "UTC",
 		},
-		URL: "https://todoist.com/showTask?id=123456789",
 	}
 }
 
-// MockProject returns a mock Project for testing
+// MockProject returns a mock Project for testing (API v1 format)
 func MockProject() *Project {
 	return &Project{
-		ID:             "987654321",
-		Name:           "Test Project",
-		CommentCount:   0,
-		Order:          1,
-		Color:          "red",
-		IsShared:       false,
-		IsFavorite:     true,
-		IsInboxProject: false,
-		IsTeamInbox:    false,
-		ViewStyle:      "list",
-		URL:            "https://todoist.com/showProject?id=987654321",
-		ParentID:       "",
+		ID:           "987654321",
+		Name:         "Test Project",
+		ChildOrder:   1,
+		Color:        "red",
+		IsShared:     false,
+		IsFavorite:   true,
+		InboxProject: false,
+		ViewStyle:    "list",
+	}
+}
+
+// MockPaginatedTasks returns a mock paginated tasks response
+func MockPaginatedTasks(tasks []Task) PaginatedResponse[Task] {
+	return PaginatedResponse[Task]{
+		Results:    tasks,
+		NextCursor: nil,
+	}
+}
+
+// MockPaginatedProjects returns a mock paginated projects response
+func MockPaginatedProjects(projects []Project) PaginatedResponse[Project] {
+	return PaginatedResponse[Project]{
+		Results:    projects,
+		NextCursor: nil,
 	}
 }
 
@@ -116,16 +128,12 @@ func NewMockToolProviderWithHandlers() *MockToolProviderWithHandlers {
 
 		// Determine the response data based on the request path
 		switch req.URL.Path {
-		case "/tasks":
-			responseData = map[string]interface{}{
-				"tasks": []interface{}{MockTask()},
-			}
+		case "/tasks", "/tasks/filter":
+			responseData = MockPaginatedTasks([]Task{*MockTask()})
 		case "/tasks/123456789":
 			responseData = MockTask()
 		case "/projects":
-			responseData = map[string]interface{}{
-				"projects": []interface{}{MockProject()},
-			}
+			responseData = MockPaginatedProjects([]Project{*MockProject()})
 		case "/projects/987654321":
 			responseData = MockProject()
 		default:
@@ -184,7 +192,7 @@ func (m *MockToolProviderWithHandlers) HandleToolCall(ctx context.Context, toolN
 	// Create the result
 	result := &mcp.CallToolResult{
 		Content: []mcp.Content{
-			mcp.NewTextContent(content),
+			&mcp.TextContent{Text: content},
 		},
 		IsError: false,
 	}

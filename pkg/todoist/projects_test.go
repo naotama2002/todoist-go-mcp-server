@@ -17,11 +17,13 @@ func TestGetProjectsTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_get_projects", tool.Name)
 	assert.Equal(t, "Get a list of projects.", tool.Description)
-	assert.True(t, *tool.Annotations.ReadOnlyHint)
+	assert.True(t, tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type
@@ -49,11 +51,13 @@ func TestGetProjectTool(t *testing.T) {
 	// Check tool properties
 	assert.Equal(t, "todoist_get_project", tool.Name)
 	assert.Equal(t, "Get a project by ID.", tool.Description)
-	assert.True(t, *tool.Annotations.ReadOnlyHint)
+	assert.True(t, tool.Annotations.ReadOnlyHint)
 
 	// Check input schema
 	var schema map[string]interface{}
-	err := json.Unmarshal([]byte(tool.RawInputSchema), &schema)
+	schemaBytes, err := json.Marshal(tool.InputSchema)
+	assert.NoError(t, err)
+	err = json.Unmarshal(schemaBytes, &schema)
 	assert.NoError(t, err)
 
 	// Check schema type and required fields

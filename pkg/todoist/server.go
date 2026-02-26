@@ -2,23 +2,20 @@ package todoist
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
 	"time"
 
-	"github.com/mark3labs/mcp-go/server"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/naotama2002/todoist-go-mcp-server/pkg/toolsets"
 	"github.com/sirupsen/logrus"
 )
 
 // Server represents a Todoist MCP server
 type Server struct {
-	mcpServer    *server.MCPServer
+	mcpServer    *mcp.Server
 	tools        *ToolProvider
 	logger       *logrus.Logger
 	httpServer   *http.Server
-	stdioServer  *server.StdioServer
 	toolsetGroup *toolsets.ToolsetGroup
 }
 
@@ -34,15 +31,13 @@ func NewServer(token string, logger *logrus.Logger) *Server {
 	tools := NewToolProvider(token, logger)
 
 	// Create a new MCP server with default options
-	mcpServer := server.NewMCPServer(
-		"todoist-mcp-server",
-		"v0.1.0",
-		server.WithToolCapabilities(true),
-		server.WithLogging(),
+	mcpServer := mcp.NewServer(
+		&mcp.Implementation{
+			Name:    "todoist-mcp-server",
+			Version: "v0.1.0",
+		},
+		nil,
 	)
-
-	// Create a new stdio server
-	stdioServer := server.NewStdioServer(mcpServer)
 
 	// Create default toolset group
 	toolsetGroup := createDefaultToolsetGroup(tools, false)
@@ -51,7 +46,6 @@ func NewServer(token string, logger *logrus.Logger) *Server {
 		mcpServer:    mcpServer,
 		tools:        tools,
 		logger:       logger,
-		stdioServer:  stdioServer,
 		toolsetGroup: toolsetGroup,
 	}
 }
@@ -102,45 +96,14 @@ func (s *Server) Start(ctx context.Context, addr string) error {
 	s.toolsetGroup.RegisterTools(s.mcpServer)
 	s.logger.Info("Registered tools from toolset group")
 
-	// Create HTTP server with MCP protocol handler
+	// Create HTTP server with StreamableHTTPHandler
+	handler := mcp.NewStreamableHTTPHandler(
+		func(r *http.Request) *mcp.Server { return s.mcpServer },
+		&mcp.StreamableHTTPOptions{JSONResponse: true},
+	)
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.Header().Set("Content-Type", "application/json")
-			if _, err := w.Write([]byte(`{"status":"ok","message":"Todoist MCP Server is running"}`)); err != nil {
-				s.logger.Errorf("Error writing response: %v", err)
-			}
-			return
-		}
-
-		// Read request body
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		defer func() {
-			if err := r.Body.Close(); err != nil {
-				s.logger.Errorf("Error closing request body: %v", err)
-			}
-		}()
-
-		// Handle MCP message
-		response := s.mcpServer.HandleMessage(r.Context(), body)
-
-		// Convert response to JSON
-		responseJSON, err := json.Marshal(response)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// Write response
-		w.Header().Set("Content-Type", "application/json")
-		if _, err := w.Write(responseJSON); err != nil {
-			s.logger.Errorf("Error writing response: %v", err)
-		}
-	})
+	mux.Handle("/", handler)
 
 	s.httpServer = &http.Server{
 		Addr:    addr,
@@ -171,11 +134,11 @@ func (s *Server) Start(ctx context.Context, addr string) error {
 }
 
 // StartStdio starts the Todoist MCP server over stdio
-func (s *Server) StartStdio(ctx context.Context, in io.Reader, out io.Writer) error {
+func (s *Server) StartStdio(ctx context.Context) error {
 	// Register tools using toolset group
 	s.toolsetGroup.RegisterTools(s.mcpServer)
 	s.logger.Info("Registered tools from toolset group")
 
 	s.logger.Info("Starting Todoist MCP server over stdio")
-	return s.stdioServer.Listen(ctx, in, out)
+	return s.mcpServer.Run(ctx, &mcp.StdioTransport{})
 }

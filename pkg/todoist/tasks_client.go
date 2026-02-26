@@ -9,28 +9,25 @@ import (
 	"net/url"
 )
 
-// GetTasks retrieves all active tasks
+// GetTasks retrieves active tasks. If filter is provided, uses the /tasks/filter endpoint.
+// Otherwise uses /tasks with optional projectID parameter.
 func (c *Client) GetTasks(ctx context.Context, projectID, filter string) ([]Task, error) {
+	// Filter uses a separate endpoint in API v1
+	if filter != "" {
+		return c.getTasksByFilter(ctx, filter)
+	}
+
 	endpoint := "/tasks"
 
 	// Add query parameters if provided
-	if projectID != "" || filter != "" {
-		// Create URL for query parameter handling
+	if projectID != "" {
 		u, err := url.Parse(endpoint)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse endpoint: %w", err)
 		}
-
-		// Use Query() to properly handle URL encoding
 		q := u.Query()
-		if projectID != "" {
-			q.Add("project_id", projectID)
-		}
-		if filter != "" {
-			q.Add("filter", filter)
-		}
+		q.Add("project_id", projectID)
 		u.RawQuery = q.Encode()
-
 		endpoint = u.String()
 	}
 
@@ -44,13 +41,45 @@ func (c *Client) GetTasks(ctx context.Context, projectID, filter string) ([]Task
 		return nil, err
 	}
 
-	// Parse response
-	var tasks []Task
-	if err := json.Unmarshal(bodyBytes, &tasks); err != nil {
+	// Parse paginated response
+	var paginatedResp PaginatedResponse[Task]
+	if err := json.Unmarshal(bodyBytes, &paginatedResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	return tasks, nil
+	return paginatedResp.Results, nil
+}
+
+// getTasksByFilter retrieves tasks using the /tasks/filter endpoint
+func (c *Client) getTasksByFilter(ctx context.Context, filter string) ([]Task, error) {
+	endpoint := "/tasks/filter"
+
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse endpoint: %w", err)
+	}
+	q := u.Query()
+	q.Add("query", filter)
+	u.RawQuery = q.Encode()
+	endpoint = u.String()
+
+	resp, err := c.doRequest(ctx, "GET", endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tasks by filter: %w", err)
+	}
+
+	bodyBytes, err := c.processResponse(resp, http.StatusOK)
+	if err != nil {
+		return nil, err
+	}
+
+	// Parse paginated response
+	var paginatedResp PaginatedResponse[Task]
+	if err := json.Unmarshal(bodyBytes, &paginatedResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return paginatedResp.Results, nil
 }
 
 // GetTask retrieves a specific task by ID

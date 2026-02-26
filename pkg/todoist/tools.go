@@ -1,7 +1,7 @@
 package todoist
 
 import (
-	"github.com/mark3labs/mcp-go/server"
+	"github.com/naotama2002/todoist-go-mcp-server/pkg/toolsets"
 	"github.com/sirupsen/logrus"
 )
 
@@ -29,9 +29,9 @@ func NewToolProvider(token string, logger *logrus.Logger) *ToolProvider {
 }
 
 // GetTools returns all Todoist tools
-func (tp *ToolProvider) GetTools() []server.ServerTool {
+func (tp *ToolProvider) GetTools() []toolsets.ServerTool {
 	// Return all tools
-	return []server.ServerTool{
+	return []toolsets.ServerTool{
 		{
 			Tool:    tp.GetTasks(),
 			Handler: tp.HandleGetTasks,

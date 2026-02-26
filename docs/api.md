@@ -37,7 +37,7 @@ Retrieves a list of tasks with optional filtering.
       "content": "Buy Milk",
       "description": "",
       "project_id": "2203306141",
-      "parent_id": "2995104589",
+      "parent_id": null,
       "priority": 1,
       "due": {
         "date": "2016-09-01",
@@ -45,8 +45,7 @@ Retrieves a list of tasks with optional filtering.
         "datetime": "2016-09-01T12:00:00.000000Z",
         "string": "tomorrow at 12",
         "timezone": "Europe/Moscow"
-      },
-      "url": "https://todoist.com/showTask?id=2995104339"
+      }
     }
   ]
 }
@@ -82,7 +81,7 @@ Retrieves a specific task by its ID.
     "content": "Buy Milk",
     "description": "",
     "project_id": "2203306141",
-    "parent_id": "2995104589",
+    "parent_id": null,
     "priority": 1,
     "due": {
       "date": "2016-09-01",
@@ -90,8 +89,7 @@ Retrieves a specific task by its ID.
       "datetime": "2016-09-01T12:00:00.000000Z",
       "string": "tomorrow at 12",
       "timezone": "Europe/Moscow"
-    },
-    "url": "https://todoist.com/showTask?id=2995104339"
+    }
   }
 }
 ```
@@ -115,7 +113,7 @@ Creates a new task.
 - `projectId` (string, optional): Project ID to assign the task to
 - `parentId` (string, optional): Parent task ID for creating subtasks
 - `order` (integer, optional): Order value for positioning the task
-- `priority` (integer, optional): Task priority: 4 (normal), 3 (medium), 2 (high), 1 (urgent)
+- `priority` (integer, optional): Task priority: 1 (normal), 2 (medium), 3 (high), 4 (urgent)
 - `dueString` (string, optional): Due date in natural language, e.g., 'today', 'tomorrow'
 - `dueDate` (string, optional): Due date in YYYY-MM-DD format
 - `dueDatetime` (string, optional): Due date and time in RFC3339 format
@@ -136,8 +134,7 @@ Creates a new task.
       "datetime": "2016-09-01T12:00:00.000000Z",
       "string": "tomorrow at 12",
       "timezone": "Europe/Moscow"
-    },
-    "url": "https://todoist.com/showTask?id=2995104339"
+    }
   }
 }
 ```
@@ -163,7 +160,7 @@ Updates an existing task.
 - `id` (string, required): The unique identifier of the task to update
 - `content` (string, optional): The new content of the task
 - `description` (string, optional): Detailed description or notes for the task
-- `priority` (integer, optional): Task priority: 4 (normal), 3 (medium), 2 (high), 1 (urgent)
+- `priority` (integer, optional): Task priority: 1 (normal), 2 (medium), 3 (high), 4 (urgent)
 - `dueString` (string, optional): Due date in natural language
 - `dueDate` (string, optional): Due date in YYYY-MM-DD format
 - `dueDatetime` (string, optional): Due date and time in RFC3339 format
@@ -184,8 +181,7 @@ Updates an existing task.
       "datetime": "2016-09-02T10:00:00.000000Z",
       "string": "tomorrow at 10",
       "timezone": "Europe/Moscow"
-    },
-    "url": "https://todoist.com/showTask?id=2995104339"
+    }
   }
 }
 ```
@@ -266,28 +262,22 @@ Retrieves a list of all projects.
       "name": "Inbox",
       "color": "grey",
       "parent_id": null,
-      "order": 0,
-      "comment_count": 0,
+      "child_order": 0,
       "is_shared": false,
       "is_favorite": false,
-      "is_inbox_project": true,
-      "is_team_inbox": false,
-      "view_style": "list",
-      "url": "https://todoist.com/showProject?id=2203306141"
+      "inbox_project": true,
+      "view_style": "list"
     },
     {
       "id": "2203306142",
       "name": "Personal",
       "color": "blue",
       "parent_id": null,
-      "order": 1,
-      "comment_count": 0,
+      "child_order": 1,
       "is_shared": false,
       "is_favorite": true,
-      "is_inbox_project": false,
-      "is_team_inbox": false,
-      "view_style": "list",
-      "url": "https://todoist.com/showProject?id=2203306142"
+      "inbox_project": false,
+      "view_style": "list"
     }
   ]
 }
@@ -315,14 +305,11 @@ Retrieves a specific project by its ID.
     "name": "Personal",
     "color": "blue",
     "parent_id": null,
-    "order": 1,
-    "comment_count": 0,
+    "child_order": 1,
     "is_shared": false,
     "is_favorite": true,
-    "is_inbox_project": false,
-    "is_team_inbox": false,
-    "view_style": "list",
-    "url": "https://todoist.com/showProject?id=2203306142"
+    "inbox_project": false,
+    "view_style": "list"
   }
 }
 ```
@@ -362,5 +349,5 @@ The Todoist API has rate limits. The server implements appropriate handling to r
 
 ## References
 
-- [Todoist REST API v2 Documentation](https://developer.todoist.com/rest/v2/)
+- [Todoist API v1 Documentation](https://developer.todoist.com/api/v1/)
 - [Model Context Protocol Specification](https://github.com/mcp-sh/mcp)

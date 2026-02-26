@@ -2,7 +2,7 @@
 
 ## 概要
 
-Todoist MCP Server は、Todoist REST API v2 を利用して、タスクとプロジェクトの管理機能を MCP ツールとして提供します。このサーバは Go 言語と mcp-go フレームワークを使用して実装されます。
+Todoist MCP Server は、Todoist API v1 を利用して、タスクとプロジェクトの管理機能を MCP ツールとして提供します。このサーバは Go 言語と公式 MCP Go SDK (modelcontextprotocol/go-sdk) を使用して実装されます。
 
 ## 認証
 
@@ -84,7 +84,7 @@ Filters in Todoist are custom views that display tasks based on specific criteri
       "content": "Buy Milk",
       "description": "",
       "project_id": "2203306141",
-      "parent_id": "2995104589",
+      "parent_id": null,
       "priority": 1,
       "due": {
         "date": "2016-09-01",
@@ -92,8 +92,7 @@ Filters in Todoist are custom views that display tasks based on specific criteri
         "datetime": "2016-09-01T12:00:00.000000Z",
         "string": "tomorrow at 12",
         "timezone": "Europe/Moscow"
-      },
-      "url": "https://todoist.com/showTask?id=2995104339"
+      }
     }
   ]
 }
@@ -114,7 +113,7 @@ Filters in Todoist are custom views that display tasks based on specific criteri
     "content": "Buy Milk",
     "description": "",
     "project_id": "2203306141",
-    "parent_id": "2995104589",
+    "parent_id": null,
     "priority": 1,
     "due": {
       "date": "2016-09-01",
@@ -122,8 +121,7 @@ Filters in Todoist are custom views that display tasks based on specific criteri
       "datetime": "2016-09-01T12:00:00.000000Z",
       "string": "tomorrow at 12",
       "timezone": "Europe/Moscow"
-    },
-    "url": "https://todoist.com/showTask?id=2995104339"
+    }
   }
 }
 ```
@@ -150,7 +148,7 @@ Filters in Todoist are custom views that display tasks based on specific criteri
     "content": "Buy Milk",
     "description": "",
     "project_id": "2203306141",
-    "parent_id": "2995104589",
+    "parent_id": null,
     "priority": 1,
     "due": {
       "date": "2016-09-01",
@@ -158,8 +156,7 @@ Filters in Todoist are custom views that display tasks based on specific criteri
       "datetime": "2016-09-01T12:00:00.000000Z",
       "string": "tomorrow at 12",
       "timezone": "Europe/Moscow"
-    },
-    "url": "https://todoist.com/showTask?id=2995104339"
+    }
   }
 }
 ```
@@ -228,15 +225,12 @@ Filters in Todoist are custom views that display tasks based on specific criteri
     {
       "id": "2203306141",
       "name": "Shopping List",
-      "comment_count": 10,
-      "order": 1,
+      "child_order": 1,
       "color": "charcoal",
       "is_shared": false,
       "is_favorite": false,
-      "is_inbox_project": false,
-      "is_team_inbox": false,
-      "view_style": "list",
-      "url": "https://todoist.com/showProject?id=2203306141"
+      "inbox_project": false,
+      "view_style": "list"
     }
   ]
 }
@@ -255,15 +249,12 @@ Filters in Todoist are custom views that display tasks based on specific criteri
   "project": {
     "id": "2203306141",
     "name": "Shopping List",
-    "comment_count": 10,
-    "order": 1,
+    "child_order": 1,
     "color": "charcoal",
     "is_shared": false,
     "is_favorite": false,
-    "is_inbox_project": false,
-    "is_team_inbox": false,
-    "view_style": "list",
-    "url": "https://todoist.com/showProject?id=2203306141"
+    "inbox_project": false,
+    "view_style": "list"
   }
 }
 ```
