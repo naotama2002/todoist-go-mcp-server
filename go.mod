@@ -3,7 +3,7 @@ module github.com/naotama2002/todoist-go-mcp-server
 go 1.25.0
 
 require (
-	github.com/modelcontextprotocol/go-sdk v1.6.0
+	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 )
