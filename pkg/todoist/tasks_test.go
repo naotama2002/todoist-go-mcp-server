@@ -995,3 +995,65 @@ func TestOptionalStringArrayParam(t *testing.T) {
 		})
 	}
 }
+
+func TestOptionalIntParam(t *testing.T) {
+	tests := []struct {
+		name     string
+		params   map[string]interface{}
+		paramKey string
+		want     int
+		wantErr  bool
+	}{
+		{
+			name:     "float64 value (JSON number)",
+			params:   map[string]interface{}{"priority": float64(4)},
+			paramKey: "priority",
+			want:     4,
+			wantErr:  false,
+		},
+		{
+			name:     "int value",
+			params:   map[string]interface{}{"priority": int(2)},
+			paramKey: "priority",
+			want:     2,
+			wantErr:  false,
+		},
+		{
+			name:     "parameter does not exist",
+			params:   map[string]interface{}{},
+			paramKey: "priority",
+			want:     0,
+			wantErr:  false,
+		},
+		{
+			name:     "nil value",
+			params:   map[string]interface{}{"priority": nil},
+			paramKey: "priority",
+			want:     0,
+			wantErr:  false,
+		},
+		{
+			name:     "wrong type",
+			params:   map[string]interface{}{"priority": "urgent"},
+			paramKey: "priority",
+			want:     0,
+			wantErr:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := MockCallToolRequest(tt.params)
+
+			got, err := OptionalIntParam(req, tt.paramKey)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
