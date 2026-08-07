@@ -272,8 +272,8 @@ func (tp *ToolProvider) HandleCreateTask(ctx context.Context, request *mcp.CallT
 	description, _ := OptionalParam[string](request, "description")
 	projectID, _ := OptionalParam[string](request, "projectId")
 	parentID, _ := OptionalParam[string](request, "parentId")
-	order, _ := OptionalParam[int](request, "order")
-	priority, _ := OptionalParam[int](request, "priority")
+	order, _ := OptionalIntParam(request, "order")
+	priority, _ := OptionalIntParam(request, "priority")
 	dueString, _ := OptionalParam[string](request, "dueString")
 	dueDate, _ := OptionalParam[string](request, "dueDate")
 	dueDatetime, _ := OptionalParam[string](request, "dueDatetime")
@@ -384,7 +384,7 @@ func (tp *ToolProvider) HandleUpdateTask(ctx context.Context, request *mcp.CallT
 
 	content, _ := OptionalParam[string](request, "content")
 	description, _ := OptionalParam[string](request, "description")
-	priority, _ := OptionalParam[int](request, "priority")
+	priority, _ := OptionalIntParam(request, "priority")
 	dueString, _ := OptionalParam[string](request, "dueString")
 	dueDate, _ := OptionalParam[string](request, "dueDate")
 	dueDatetime, _ := OptionalParam[string](request, "dueDatetime")
@@ -567,6 +567,30 @@ func OptionalParam[T any](r *mcp.CallToolRequest, p string) (T, error) {
 	}
 
 	return args[p].(T), nil
+}
+
+// OptionalIntParam is a helper function that fetches an integer parameter from the request.
+// JSON numbers are always float64 after json.Unmarshal, so this handles both float64 and int.
+func OptionalIntParam(r *mcp.CallToolRequest, p string) (int, error) {
+	args, err := getArguments(r)
+	if err != nil {
+		return 0, err
+	}
+
+	if _, ok := args[p]; !ok {
+		return 0, nil
+	}
+
+	switch v := args[p].(type) {
+	case float64:
+		return int(v), nil
+	case int:
+		return v, nil
+	case nil:
+		return 0, nil
+	default:
+		return 0, fmt.Errorf("parameter %s is not a number", p)
+	}
 }
 
 // OptionalStringArrayParam is a helper function that can be used to fetch a requested parameter from the request.
